@@ -53,11 +53,12 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
     isDragging: isSortableDragging
   } = useSortable({
     id: task.id,
+    animateLayoutChanges: () => true, // Always animate layout changes
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || 'transform 200ms ease',
   };
 
   const handleSave = async () => {
@@ -97,8 +98,8 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
       {...attributes}
       {...listeners}
       className={cn(
-        "touch-none",
-        (isDragging || isSortableDragging) && "opacity-50"
+        "touch-none transition-opacity duration-200",
+        (isDragging || isSortableDragging) && "opacity-30"
       )}
     >
       <Card className="cursor-move hover:shadow-md transition-all duration-300 ease-in-out">

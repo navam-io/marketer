@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
+  DragOverEvent,
   DragOverlay,
   DragStartEvent,
   PointerSensor,
@@ -13,7 +14,8 @@ import {
 } from '@dnd-kit/core';
 import {
   SortableContext,
-  verticalListSortingStrategy
+  verticalListSortingStrategy,
+  arrayMove
 } from '@dnd-kit/sortable';
 import { KanbanColumn } from './kanban-column';
 import { KanbanCard } from './kanban-card';
@@ -48,7 +50,13 @@ const COLUMNS = [
 
 export function KanbanBoard({ tasks, onTaskUpdate, onTaskDelete }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [localTasks, setLocalTasks] = useState<Task[]>(tasks);
   const { setIsDragging } = useAppStore();
+
+  // Update local tasks when props change
+  React.useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -59,11 +67,76 @@ export function KanbanBoard({ tasks, onTaskUpdate, onTaskDelete }: KanbanBoardPr
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    const task = tasks.find(t => t.id === event.active.id);
+    const task = localTasks.find(t => t.id === event.active.id);
     if (task) {
       setActiveTask(task);
       setIsDragging(true);
     }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Find the active and over tasks
+    const activeTask = localTasks.find(t => t.id === activeId);
+    const overTask = localTasks.find(t => t.id === overId);
+
+    if (!activeTask) return;
+
+    // Determine the target status (either a column id or task's status)
+    const activeStatus = activeTask.status;
+    const overStatus = overTask ? overTask.status : overId;
+
+    // If dragging over the same position, do nothing
+    if (activeId === overId) return;
+
+    // Update local state for smooth animation
+    setLocalTasks((prevTasks) => {
+      const activeIndex = prevTasks.findIndex(t => t.id === activeId);
+      const overIndex = prevTasks.findIndex(t => t.id === overId);
+
+      if (activeIndex === -1) return prevTasks;
+
+      // If dragging over a column header (not a task)
+      if (overIndex === -1) {
+        // Moving to a different column
+        if (activeStatus !== overStatus) {
+          const updatedTasks = [...prevTasks];
+          updatedTasks[activeIndex] = {
+            ...updatedTasks[activeIndex],
+            status: overStatus
+          };
+          return updatedTasks;
+        }
+        return prevTasks;
+      }
+
+      // If dragging over another task
+      if (activeStatus === overStatus) {
+        // Reordering within the same column
+        return arrayMove(prevTasks, activeIndex, overIndex);
+      } else {
+        // Moving to a different column
+        const updatedTasks = [...prevTasks];
+        updatedTasks[activeIndex] = {
+          ...updatedTasks[activeIndex],
+          status: overStatus
+        };
+
+        // Move the task to the position of the over task
+        const taskToMove = updatedTasks[activeIndex];
+        updatedTasks.splice(activeIndex, 1);
+        const newOverIndex = updatedTasks.findIndex(t => t.id === overId);
+        updatedTasks.splice(newOverIndex, 0, taskToMove);
+
+        return updatedTasks;
+      }
+    });
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -71,25 +144,31 @@ export function KanbanBoard({ tasks, onTaskUpdate, onTaskDelete }: KanbanBoardPr
     setActiveTask(null);
     setIsDragging(false);
 
-    if (!over) return;
+    if (!over) {
+      // Reset to original state if dropped outside
+      setLocalTasks(tasks);
+      return;
+    }
 
     const taskId = active.id as string;
-    const newStatus = over.id as string;
+    const task = localTasks.find(t => t.id === taskId);
 
-    // Find the task being moved
-    const task = tasks.find(t => t.id === taskId);
+    if (!task) {
+      setLocalTasks(tasks);
+      return;
+    }
 
-    if (task && task.status !== newStatus) {
-      // Update task status
+    // Only update if status actually changed
+    if (task.status !== tasks.find(t => t.id === taskId)?.status) {
       await onTaskUpdate(taskId, {
-        status: newStatus,
-        postedAt: newStatus === 'posted' ? new Date() : task.postedAt
+        status: task.status,
+        postedAt: task.status === 'posted' ? new Date() : task.postedAt
       });
     }
   };
 
   const getTasksByStatus = (status: string) => {
-    return tasks.filter(task => task.status === status);
+    return localTasks.filter(task => task.status === status);
   };
 
   return (
@@ -97,6 +176,7 @@ export function KanbanBoard({ tasks, onTaskUpdate, onTaskDelete }: KanbanBoardPr
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
