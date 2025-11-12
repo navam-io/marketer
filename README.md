@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -321,13 +321,8 @@ marketer/
 
 - [x] **v0.1.0** — Source Ingestion
 - [x] **v0.2.0** — Campaign & Task Management (Kanban)
-
-### 🚧 In Progress
-
-- [ ] **v0.3.0** — Content Generation with Claude AI
-  - Multi-platform content generation
-  - AI-powered post creation
-  - Tone and style customization
+- [x] **v0.3.0** — Content Generation with Claude AI
+- [x] **v0.3.1** — Claude Model Update (Bug Fix)
 
 ### 📅 Planned
 

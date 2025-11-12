@@ -68,7 +68,7 @@
 #### Claude Integration Details
 
 **Model Configuration:**
-- Model: `claude-3-5-sonnet-20241022`
+- Model: `claude-sonnet-4-5-20250929` (updated from `claude-3-5-sonnet-20241022`)
 - Max tokens: 2048
 - Temperature: 0.7 (balanced creativity)
 - Structured prompt engineering
