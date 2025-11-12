@@ -15,7 +15,8 @@ import { CreateCampaignDialog } from '@/components/create-campaign-dialog';
 import { CreateTaskDialog } from '@/components/create-task-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 
 interface Campaign {
   id: string;
@@ -190,10 +191,18 @@ export default function CampaignsPage() {
           <h1 className="text-3xl font-bold">Campaigns</h1>
           <p className="text-slate-600 mt-1">Manage your marketing campaigns and tasks</p>
         </div>
-        <Button onClick={() => setIsCreateCampaignOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Campaign
-        </Button>
+        <div className="flex gap-3">
+          <Link href="/dashboard">
+            <Button variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
+          <Button onClick={() => setIsCreateCampaignOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Campaign
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">

@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.4.0
+**Version:** 0.6.0
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -1230,6 +1230,233 @@ test('should generate content for multiple platforms', async ({ page }) => {
   const draftColumn = page.locator('.column:has-text("Draft")');
   const taskCards = draftColumn.locator('.task-card');
   await expect(taskCards).toHaveCount(3);
+});
+```
+
+---
+
+## Feature 5: Performance Dashboard (v0.6.0)
+
+### Test Case 5.1: Navigate to Dashboard
+
+**Steps:**
+1. Navigate to `http://localhost:3000/campaigns`
+2. Locate "Dashboard" button in header
+3. Click "Dashboard" button
+4. Wait for dashboard page to load
+
+**Expected Results:**
+- [ ] Dashboard link appears in campaigns page header
+- [ ] Click navigates to `/dashboard` URL
+- [ ] Dashboard page loads successfully
+- [ ] Page title is "Performance Dashboard"
+- [ ] KPI cards are visible
+
+**Selectors:**
+- Dashboard Button: `button:has-text("Dashboard")`
+- Dashboard Page: `h1:has-text("Performance Dashboard")`
+
+---
+
+### Test Case 5.2: Verify KPI Cards
+
+**URL:** `http://localhost:3000/dashboard`
+
+**Expected Elements:**
+- [ ] Total Posts card with icon
+- [ ] Total Clicks card with icon
+- [ ] Total Likes card with icon
+- [ ] Total Shares card with icon
+- [ ] Each card shows a numeric value
+- [ ] Cards are responsive (grid layout)
+
+**Expected State (with data):**
+- Values should be >= 0
+- Cards have distinct colors (blue, green, pink, purple)
+- Numbers formatted with commas if > 999
+
+**Expected State (empty):**
+- All cards show 0
+
+**Selectors:**
+- KPI Cards: `.card` or container with metrics
+- Values: Large numbers in cards
+- Icons: BarChart3, MousePointerClick, Heart, Share2
+
+---
+
+### Test Case 5.3: Verify Engagement Chart
+
+**URL:** `http://localhost:3000/dashboard`
+
+**Expected Elements:**
+- [ ] Chart section with title "Engagement Over Time"
+- [ ] Line chart with X/Y axes
+- [ ] Three data series (Clicks, Likes, Shares)
+- [ ] Legend showing series names
+- [ ] Formatted dates on X-axis
+- [ ] Responsive chart container
+
+**Expected State (with data):**
+- Lines visible with data points
+- Hover tooltips show values
+- Smooth line transitions
+
+**Expected State (empty):**
+- Empty state message: "No engagement data yet"
+- Helpful text about metrics appearing
+
+**Selectors:**
+- Chart Container: Container with Recharts SVG
+- Chart Lines: SVG paths with strokes
+- Legend: Chart legend items
+
+---
+
+### Test Case 5.4: Create Metrics via API
+
+**Purpose:** Test metrics creation and dashboard refresh
+
+**Steps:**
+1. Create a campaign and task (via UI or API)
+2. Create metrics via API:
+   ```javascript
+   await fetch('http://localhost:3000/api/metrics', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+       taskId: 'task_id_here',
+       type: 'click',
+       value: 5
+     })
+   });
+   ```
+3. Refresh dashboard page
+4. Verify metrics appear
+
+**Expected Results:**
+- [ ] API returns 201 status
+- [ ] Metric created successfully
+- [ ] Dashboard reflects new data
+- [ ] Total Clicks increases by 5
+- [ ] Chart shows data point
+
+---
+
+### Test Case 5.5: Test Redirect Tracker
+
+**Purpose:** Verify link click tracking
+
+**Steps:**
+1. Create a task (get task ID)
+2. Navigate to redirect URL:
+   `http://localhost:3000/r/{taskId}?url=https://example.com`
+3. Wait for redirect
+4. Check if metric was recorded
+
+**Expected Results:**
+- [ ] Page redirects to destination URL
+- [ ] Click metric created in database
+- [ ] Dashboard shows increased click count
+
+**Verification:**
+- Query metrics API: `GET /api/metrics?taskId={taskId}`
+- Should find click metric with value 1
+
+---
+
+### Test Case 5.6: Dashboard Loading States
+
+**URL:** `http://localhost:3000/dashboard`
+
+**Expected Loading Behavior:**
+- [ ] Loading spinner appears initially
+- [ ] Text: "Loading dashboard..."
+- [ ] Spinner animates (rotating)
+- [ ] Content appears after load
+
+**Expected Error Handling:**
+- Simulate API error (disconnect network)
+- [ ] Error message appears
+- [ ] "Try Again" button shown
+- [ ] Click button refetches data
+
+**Selectors:**
+- Loading Spinner: `.animate-spin`
+- Error Message: Red alert/message
+- Retry Button: `button:has-text("Try Again")`
+
+---
+
+### Test Case 5.7: Link Tracking Instructions
+
+**URL:** `http://localhost:3000/dashboard`
+
+**Expected Elements:**
+- [ ] Info card with tracking instructions
+- [ ] Code example showing redirect URL format
+- [ ] Explanation of {taskId} and {destinationURL} placeholders
+- [ ] Blue/info styling for visibility
+
+**Content Verification:**
+- URL format shown: `/r/{taskId}?url={destinationURL}`
+- Instructions clear and helpful
+- Example code copyable
+
+---
+
+### Playwright Test Example: Dashboard Flow
+
+```javascript
+test('should display dashboard with metrics', async ({ page }) => {
+  // Setup: Create campaign, task, and metrics
+  const campaign = await createTestCampaign();
+  const task = await createTestTask({ campaignId: campaign.id, status: 'posted' });
+
+  await fetch('http://localhost:3000/api/metrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ taskId: task.id, type: 'click', value: 10 })
+  });
+
+  // Navigate to dashboard
+  await page.goto('http://localhost:3000/dashboard');
+
+  // Wait for loading to complete
+  await page.waitForSelector('h1:has-text("Performance Dashboard")');
+
+  // Verify KPI cards
+  await expect(page.locator('text=/Total Posts/i')).toBeVisible();
+  await expect(page.locator('text=/Total Clicks/i')).toBeVisible();
+  await expect(page.locator('text=/Total Likes/i')).toBeVisible();
+  await expect(page.locator('text=/Total Shares/i')).toBeVisible();
+
+  // Verify clicks value
+  const clicksCard = page.locator('.card:has-text("Total Clicks")');
+  await expect(clicksCard).toContainText('10');
+
+  // Verify chart is visible
+  await expect(page.locator('text=/Engagement Over Time/i')).toBeVisible();
+});
+
+test('should track clicks via redirect', async ({ page }) => {
+  const campaign = await createTestCampaign();
+  const task = await createTestTask({ campaignId: campaign.id });
+
+  // Navigate to redirect URL
+  const redirectUrl = `http://localhost:3000/r/${task.id}?url=https://example.com`;
+  await page.goto(redirectUrl);
+
+  // Wait for redirect
+  await page.waitForURL('https://example.com', { timeout: 5000 });
+
+  // Verify metric was created
+  const response = await fetch(`http://localhost:3000/api/metrics?taskId=${task.id}`);
+  const data = await response.json();
+
+  expect(data.metrics).toHaveLength(1);
+  expect(data.metrics[0].type).toBe('click');
+  expect(data.metrics[0].value).toBe(1);
 });
 ```
 

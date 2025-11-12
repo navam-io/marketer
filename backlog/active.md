@@ -109,19 +109,26 @@ Automate content → promo generation → scheduling → simple analytics, using
 
 ---
 
-### Slice 5 – Performance Dashboard
+### Slice 5 – Performance Dashboard ✅ COMPLETED (v0.6.0)
 **User story:** As a founder, I can see engagement metrics at a glance.
 
-**Features**
+**Status:** Implemented and tested
+**Release:** v0.6.0
+**Details:** See `backlog/release-0.6.0.md`
+
+**Features** ✅
 - Mini-KPI cards: total posts, clicks, likes, shares.
 - Recharts graph: engagement over time.
 - Links served through `/r/:id` route to record metrics before redirect.
+- Dashboard page with beautiful visualizations.
+- Metrics API with aggregation endpoints.
+- Link click tracking with redirect tracker.
 
 **Stack**
-- Frontend: Recharts, Tailwind grid.
-- Backend: `/api/metrics` routes + redirect tracker.
-- DB: `Metrics` model in Prisma.
-- Eval checkpoint: data correctness and visual clarity.
+- Frontend: Recharts, Tailwind grid, responsive design.
+- Backend: `/api/metrics` routes + redirect tracker + stats endpoint.
+- DB: `Metrics` model in Prisma (already existed).
+- Eval checkpoint: data correctness and visual clarity ✅ Excellent (75 tests pass).
 
 ---
 

@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -125,6 +125,38 @@ Schedule posts for automatic publishing at future dates/times.
 - Development: In-process scheduler auto-starts
 - Production: Migrate to Vercel Cron Jobs or external cron service
 - Flexible: Works with any hosting platform
+
+</details>
+
+<details open>
+<summary><b>📊 Performance Dashboard</b> <code>v0.6.0</code></summary>
+
+<br>
+
+Track your social media engagement with real-time metrics and beautiful visualizations.
+
+**KPI Cards**
+- 📊 **Total Posts**: Count of published content
+- 👆 **Total Clicks**: Link clicks via tracking
+- ❤️ **Total Likes**: Engagement metrics
+- 🔄 **Total Shares**: Content sharing stats
+
+**Engagement Chart**
+- 📈 Line chart showing metrics over last 30 days
+- Multiple data series (clicks, likes, shares)
+- Interactive tooltips and legend
+- Responsive design for all screen sizes
+
+**Link Click Tracking**
+- Redirect tracker: `/r/{taskId}?url={destination}`
+- Automatic click recording
+- Real-time dashboard updates
+- Easy integration in social posts
+
+**API Endpoints**
+- `GET /api/metrics` - Retrieve metrics with filtering
+- `POST /api/metrics` - Create new metrics
+- `GET /api/metrics/stats` - Aggregated statistics
 
 </details>
 
@@ -294,6 +326,12 @@ Workflow:
 </td>
 </tr>
 <tr>
+<td><b>Charts</b></td>
+<td>
+  <img src="https://img.shields.io/badge/Recharts-3.4-FF6384" alt="Recharts">
+</td>
+</tr>
+<tr>
 <td><b>Tools</b></td>
 <td>
   <img src="https://img.shields.io/badge/Mozilla_Readability-0.5-000000" alt="Readability">
@@ -364,16 +402,17 @@ marketer/
 - [x] **v0.2.0** — Campaign & Task Management (Kanban)
 - [x] **v0.3.0** — Content Generation with Claude AI
 - [x] **v0.3.1** — Claude Model Update (Bug Fix)
+- [x] **v0.3.2** — Automated Testing Support
 - [x] **v0.4.0** — Scheduling & Auto-Posting
+- [x] **v0.4.1** — Next.js Config Fix
+- [x] **v0.4.2** — Auto-Schedule Status Change
+- [x] **v0.4.3 & v0.4.4** — Campaign Task Count Refresh
+- [x] **v0.5.0** — Smooth Drag-and-Drop Animations
+- [x] **v0.6.0** — Performance Dashboard & Analytics
 
 ### 📅 Planned
 
-- [ ] **v0.5.0** — Performance Dashboard
-  - Engagement metrics
-  - KPI cards and charts
-  - Link tracking and analytics
-
-- [ ] **v0.6.0** — Authentication (Optional)
+- [ ] **v0.7.0** — Authentication (Optional)
   - Passwordless login
   - OAuth integration
   - Multi-user support
