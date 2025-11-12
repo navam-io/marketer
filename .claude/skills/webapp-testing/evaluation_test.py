@@ -278,15 +278,15 @@ def test_campaign_management(page):
         # Wait for dialog
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        # Fill campaign details
-        name_input = page.locator('input[name="name"]').first
+        # Fill campaign details using data-testid
+        name_input = page.locator('[data-testid="campaign-name-input"]').first
         name_input.fill('Product Launch Q1')
 
-        desc_input = page.locator('textarea[name="description"]').first
+        desc_input = page.locator('[data-testid="campaign-description-input"]').first
         desc_input.fill('Social media campaign for our new product release')
 
         # Click Create
-        create_btn = page.locator('[role="dialog"] button:has-text("Create")').first
+        create_btn = page.locator('[data-testid="create-campaign-submit"]').first
         create_btn.click()
 
         # Wait for dialog to close
@@ -327,20 +327,22 @@ def test_campaign_management(page):
         # Wait for dialog
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        # Select platform
-        platform_select = page.locator('select[name="platform"]').first
-        platform_select.select_option('linkedin')
+        # Select platform using data-testid
+        platform_select = page.locator('[data-testid="task-platform-select"]').first
+        platform_select.click()
+        page.locator('[role="option"]:has-text("LinkedIn")').first.click()
 
         # Select status
-        status_select = page.locator('select[name="status"]').first
-        status_select.select_option('todo')
+        status_select = page.locator('[data-testid="task-status-select"]').first
+        status_select.click()
+        page.locator('[role="option"]:has-text("To Do")').first.click()
 
         # Fill content
-        content_input = page.locator('textarea[name="content"]').first
+        content_input = page.locator('[data-testid="task-content-input"]').first
         content_input.fill('Excited to announce our new product launch! This will revolutionize how you work. #ProductLaunch #Innovation')
 
         # Click Create
-        create_btn = page.locator('[role="dialog"] button:has-text("Create")').first
+        create_btn = page.locator('[data-testid="create-task-submit"]').first
         create_btn.click()
 
         # Wait for dialog to close
@@ -381,11 +383,13 @@ def test_campaign_management(page):
         new_task_btn.click()
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        page.locator('select[name="platform"]').first.select_option('twitter')
-        page.locator('select[name="status"]').first.select_option('draft')
-        page.locator('textarea[name="content"]').first.fill('🚀 Big news coming! Our new product drops next week. #ProductLaunch')
+        page.locator('[data-testid="task-platform-select"]').first.click()
+        page.locator('[role="option"]:has-text("Twitter")').first.click()
+        page.locator('[data-testid="task-status-select"]').first.click()
+        page.locator('[role="option"]:has-text("Draft")').first.click()
+        page.locator('[data-testid="task-content-input"]').first.fill('🚀 Big news coming! Our new product drops next week. #ProductLaunch')
 
-        page.locator('[role="dialog"] button:has-text("Create")').first.click()
+        page.locator('[data-testid="create-task-submit"]').first.click()
         page.wait_for_selector('[role="dialog"]', state='hidden', timeout=3000)
         time.sleep(0.5)
 
@@ -424,10 +428,10 @@ def test_campaign_management(page):
         new_campaign_btn.click()
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        page.locator('input[name="name"]').first.fill('Blog Series 2025')
-        page.locator('textarea[name="description"]').first.fill('Educational content series')
+        page.locator('[data-testid="campaign-name-input"]').first.fill('Blog Series 2025')
+        page.locator('[data-testid="campaign-description-input"]').first.fill('Educational content series')
 
-        page.locator('[role="dialog"] button:has-text("Create")').first.click()
+        page.locator('[data-testid="create-campaign-submit"]').first.click()
         page.wait_for_selector('[role="dialog"]', state='hidden', timeout=3000)
 
         screenshot = save_screenshot(page, '2.8-multiple-campaigns')
@@ -509,25 +513,25 @@ def test_content_generation(page):
         has_generate_btn = False
 
         try:
-            page.locator('select[name="sourceId"]').first.wait_for(state='visible', timeout=2000)
+            page.locator('[data-testid="generate-source-select"]').first.wait_for(state='visible', timeout=2000)
             has_source_select = True
         except:
             pass
 
         try:
-            page.locator('input[type="checkbox"]').first.wait_for(state='visible', timeout=2000)
+            page.locator('[data-testid="generate-platform-linkedin"]').first.wait_for(state='visible', timeout=2000)
             has_platform_checkboxes = True
         except:
             pass
 
         try:
-            page.locator('select[name="tone"]').first.wait_for(state='visible', timeout=2000)
+            page.locator('[data-testid="generate-tone-select"]').first.wait_for(state='visible', timeout=2000)
             has_tone_select = True
         except:
             pass
 
         try:
-            page.locator('[role="dialog"] button:has-text("Generate")').first.wait_for(state='visible', timeout=2000)
+            page.locator('[data-testid="generate-content-submit"]').first.wait_for(state='visible', timeout=2000)
             has_generate_btn = True
         except:
             pass
@@ -570,33 +574,41 @@ def test_content_generation(page):
         generate_btn.click()
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        # Select first source
-        source_select = page.locator('select[name="sourceId"]').first
-        source_select.select_option(index=0)
+        # Wait for sources to load
+        time.sleep(1)
 
-        # Uncheck all platforms first (they might be checked by default)
-        checkboxes = page.locator('input[type="checkbox"]').all()
-        for cb in checkboxes:
-            if cb.is_checked():
-                cb.uncheck()
+        # Select first source using data-testid
+        source_select = page.locator('[data-testid="generate-source-select"]').first
+        source_select.click()
+        # Click first available option
+        page.locator('[role="option"]').first.click()
 
-        # Check only LinkedIn
-        linkedin_checkbox = page.locator('input[type="checkbox"][value="linkedin"], input[type="checkbox"][value="LinkedIn"]').first
-        linkedin_checkbox.check()
+        # Uncheck all platforms first (LinkedIn is checked by default)
+        twitter_checkbox = page.locator('[data-testid="generate-platform-twitter"]').first
+        if twitter_checkbox.is_checked():
+            twitter_checkbox.uncheck()
 
-        # Select tone
-        tone_select = page.locator('select[name="tone"]').first
-        tone_select.select_option('professional')
+        blog_checkbox = page.locator('[data-testid="generate-platform-blog"]').first
+        if blog_checkbox.is_checked():
+            blog_checkbox.uncheck()
 
-        # Enter CTA (if field exists)
-        try:
-            cta_input = page.locator('input[name="cta"]').first
-            cta_input.fill('Learn more at example.com')
-        except:
-            pass  # CTA might be optional
+        # LinkedIn should already be checked by default, but ensure it
+        linkedin_checkbox = page.locator('[data-testid="generate-platform-linkedin"]').first
+        if not linkedin_checkbox.is_checked():
+            linkedin_checkbox.check()
+
+        # Select tone (professional is default, so we can skip)
+        # But let's explicitly set it
+        tone_select = page.locator('[data-testid="generate-tone-select"]').first
+        tone_select.click()
+        page.locator('[role="option"]:has-text("Professional")').first.click()
+
+        # Enter CTA
+        cta_input = page.locator('[data-testid="generate-cta-input"]').first
+        cta_input.fill('Learn more at example.com')
 
         # Click Generate
-        gen_btn = page.locator('[role="dialog"] button:has-text("Generate")').first
+        gen_btn = page.locator('[data-testid="generate-content-submit"]').first
         gen_btn.click()
 
         # Wait for generation (up to 30 seconds)
@@ -653,20 +665,34 @@ def test_content_generation(page):
         generate_btn.click()
         page.wait_for_selector('[role="dialog"]', timeout=3000)
 
-        # Select first source
-        page.locator('select[name="sourceId"]').first.select_option(index=0)
+        # Wait for sources to load
+        time.sleep(1)
 
-        # Check all platforms
-        checkboxes = page.locator('input[type="checkbox"]').all()
-        for cb in checkboxes:
-            if not cb.is_checked():
-                cb.check()
+        # Select first source
+        source_select = page.locator('[data-testid="generate-source-select"]').first
+        source_select.click()
+        page.locator('[role="option"]').first.click()
+
+        # Ensure all platforms are checked (LinkedIn is default)
+        linkedin_checkbox = page.locator('[data-testid="generate-platform-linkedin"]').first
+        if not linkedin_checkbox.is_checked():
+            linkedin_checkbox.check()
+
+        twitter_checkbox = page.locator('[data-testid="generate-platform-twitter"]').first
+        if not twitter_checkbox.is_checked():
+            twitter_checkbox.check()
+
+        blog_checkbox = page.locator('[data-testid="generate-platform-blog"]').first
+        if not blog_checkbox.is_checked():
+            blog_checkbox.check()
 
         # Select casual tone
-        page.locator('select[name="tone"]').first.select_option('casual')
+        tone_select = page.locator('[data-testid="generate-tone-select"]').first
+        tone_select.click()
+        page.locator('[role="option"]:has-text("Casual")').first.click()
 
         # Click Generate
-        page.locator('[role="dialog"] button:has-text("Generate")').first.click()
+        page.locator('[data-testid="generate-content-submit"]').first.click()
 
         # Wait for generation (longer for multiple platforms)
         print("   ⏳ Waiting for multi-platform generation (this may take 10-20 seconds)...")

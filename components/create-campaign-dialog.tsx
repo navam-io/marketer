@@ -66,6 +66,7 @@ export function CreateCampaignDialog({ onCampaignCreated }: CreateCampaignDialog
               <Label htmlFor="name">Campaign Name *</Label>
               <Input
                 id="name"
+                data-testid="campaign-name-input"
                 placeholder="e.g., Product Launch Q4 2024"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -76,6 +77,7 @@ export function CreateCampaignDialog({ onCampaignCreated }: CreateCampaignDialog
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                data-testid="campaign-description-input"
                 placeholder="Brief description of this campaign..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -91,7 +93,7 @@ export function CreateCampaignDialog({ onCampaignCreated }: CreateCampaignDialog
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !name.trim()}>
+            <Button type="submit" disabled={isLoading || !name.trim()} data-testid="create-campaign-submit">
               {isLoading ? 'Creating...' : 'Create Campaign'}
             </Button>
           </DialogFooter>

@@ -185,7 +185,7 @@ export function GenerateContentDialog({
               ) : (
                 <>
                   <Select value={selectedSourceId} onValueChange={setSelectedSourceId}>
-                    <SelectTrigger>
+                    <SelectTrigger data-testid="generate-source-select">
                       <SelectValue placeholder="Select a source" />
                     </SelectTrigger>
                     <SelectContent>
@@ -213,6 +213,7 @@ export function GenerateContentDialog({
                   <div key={platform.value} className="flex items-start space-x-3">
                     <Checkbox
                       id={platform.value}
+                      data-testid={`generate-platform-${platform.value}`}
                       checked={selectedPlatforms.has(platform.value)}
                       onCheckedChange={() => togglePlatform(platform.value)}
                     />
@@ -236,7 +237,7 @@ export function GenerateContentDialog({
             <div className="space-y-2">
               <Label htmlFor="tone">Tone</Label>
               <Select value={tone} onValueChange={setTone}>
-                <SelectTrigger>
+                <SelectTrigger data-testid="generate-tone-select">
                   <SelectValue placeholder="Select tone" />
                 </SelectTrigger>
                 <SelectContent>
@@ -254,6 +255,7 @@ export function GenerateContentDialog({
               <Label htmlFor="cta">Call to Action (Optional)</Label>
               <Input
                 id="cta"
+                data-testid="generate-cta-input"
                 placeholder="e.g., Learn more, Sign up, Visit our website..."
                 value={cta}
                 onChange={(e) => setCta(e.target.value)}
@@ -287,6 +289,7 @@ export function GenerateContentDialog({
             <Button
               type="submit"
               disabled={isLoading || loadingSources || sources.length === 0}
+              data-testid="generate-content-submit"
             >
               {isLoading ? (
                 <>

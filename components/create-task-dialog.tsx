@@ -92,7 +92,7 @@ export function CreateTaskDialog({ campaignId, onTaskCreated }: CreateTaskDialog
             <div className="space-y-2">
               <Label htmlFor="platform">Platform</Label>
               <Select value={platform} onValueChange={setPlatform}>
-                <SelectTrigger>
+                <SelectTrigger data-testid="task-platform-select">
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent>
@@ -107,7 +107,7 @@ export function CreateTaskDialog({ campaignId, onTaskCreated }: CreateTaskDialog
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
+                <SelectTrigger data-testid="task-status-select">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -123,6 +123,7 @@ export function CreateTaskDialog({ campaignId, onTaskCreated }: CreateTaskDialog
               <Label htmlFor="content">Content</Label>
               <Textarea
                 id="content"
+                data-testid="task-content-input"
                 placeholder="Write your post content here..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -139,7 +140,7 @@ export function CreateTaskDialog({ campaignId, onTaskCreated }: CreateTaskDialog
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} data-testid="create-task-submit">
               {isLoading ? 'Creating...' : 'Create Task'}
             </Button>
           </DialogFooter>
