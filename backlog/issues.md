@@ -1,3 +1,3 @@
 # Issues
 
-[ ] Add capability to check if web app is running locally and Anthropci is already authenticated (Max/Pro account). Use that authentication instead of looking for .env file key. Similarly check if anthropic key is available in local environment variable and use that instead of checking .env. Ultimately check .env if all else fails.
+[ ] Fix Claude API error: 404 {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-sonnet-20241022"},"request_id":"req_011CV3USnQGM4CQ6CJrSF4Rs"}. Use claude-sonnet-4-5 model.

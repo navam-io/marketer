@@ -1,5 +1,5 @@
 Think harder to complete these tasks:
-1. Read backlog/issue.md
+1. Read backlog/issues.md
 2. Understand the current state of the project
 3. Identify the next issue to resolve
 4. Resolve the issue
