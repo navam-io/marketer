@@ -7,3 +7,5 @@ Think harder to complete these tasks:
 6. Run all tests and fix any regressions
 7. Determine semver increment (major, minor, patch) based on feature size. Increment the semver for the project.
 8. When done, mark the feature complete and move it to respective backlog/release-semver.md file based on current release semver.
+9. Update evals/evaluation-guide.md with the feature released.
+10. Update README.md with the feature released.
