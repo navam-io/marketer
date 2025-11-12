@@ -1,0 +1,188 @@
+# Active Backlog
+
+# Marketing Automation MLP – Build Spec (for Claude Code)
+
+## 1. Overview
+
+**Product:** Navam Marketer (MLP edition)  
+**Audience / ICP:** Bootstrapped startup founders who need to quickly turn existing content (website, blog, or product page) into social promotions (LinkedIn posts, tweets, short blogs) without hiring a marketing team.
+
+**Goal:**  
+Automate content → promo generation → scheduling → simple analytics, using Claude (via Bedrock/Anthropic) + minimal full-stack code.
+
+---
+
+## 2. Core Principles
+
+- **MLP, not MVP**: deliver *delight* with minimal code — it must be usable and visually pleasing.  
+- **Human in Loop**: each feature slice can be reviewed or edited by the founder before publishing.  
+- **Single repo**: Next.js 15 (App Router) + Tailwind + Prisma.  
+- **Claude-ready**: every feature exposed through API route for LLM orchestration.  
+- **Local-first**: runs with SQLite and serverless deploy later (Vercel + Neon).
+
+---
+
+## 3. Feature Slices
+
+### Slice 1 – Source Ingestion ✅ COMPLETED (v0.1.0)
+**User story:** As a founder, I can paste a URL (product/blog) or text snippet and see a cleaned, readable summary of it.
+
+**Status:** Implemented and tested
+**Release:** v0.1.0
+**Details:** See `backlog/release-0.1.0.md`
+
+**Features** ✅
+- URL input + fetch button.
+- Readability extraction (JS-based).
+- Display cleaned markdown + save to DB.
+
+**Stack**
+- Frontend: `shadcn/ui` input + preview pane.
+- Backend: Next.js route `/api/source/fetch` using `@mozilla/readability` + `jsdom`.
+- DB: `Source` table in Prisma.
+- Eval checkpoint: extracted summary relevance & formatting.
+
+---
+
+### Slice 2 – Campaign & Task Management (Kanban)
+**User story:** As a founder, I can create a campaign and view my generated tasks on a drag-drop Kanban board.
+
+**Features**
+- CRUD for campaigns.
+- Kanban board with columns: *Todo*, *Draft*, *Scheduled*, *Posted*.
+- Drag & drop tasks between columns.
+- Inline edit of post text.
+
+**Stack**
+- Frontend: `dnd-kit`, `shadcn/ui`, Zustand for UI state.
+- Backend: `/api/tasks/*` routes with Prisma `Task` model.
+- Eval checkpoint: drag/drop smoothness, state persistence.
+
+---
+
+### Slice 3 – Content Generation (Claude Agent)
+**User story:** As a founder, I can select a source and auto-generate social posts for multiple platforms.
+
+**Features**
+- “Generate from Source” modal (choose platforms, tone, CTA).
+- Call Claude (Bedrock or Anthropic) to produce structured JSON output.
+- Save drafts to `Task.outputJson`.
+
+**Stack**
+- Backend: `/api/generate` route with LangGraph mini-flow:
+  1. summarize source
+  2. format per platform schema
+- LLM: Claude Sonnet via AWS Bedrock (`@aws-sdk/client-bedrock-runtime`) or Anthropic SDK.
+- Eval checkpoint: quality of generated JSON and tone.
+
+---
+
+### Slice 4 – Scheduling & Mock Posting
+**User story:** As a founder, I can schedule posts for later and see them move automatically to “Posted”.
+
+**Features**
+- Date/time picker on Kanban card.
+- Simple cron loop (in-process timer).
+- Auto-update status → “Posted”.
+- Mock “share” log.
+
+**Stack**
+- Frontend: date picker (`shadcn/ui`).
+- Backend: Node interval job (no external queue yet).
+- Eval checkpoint: accurate state transitions.
+
+---
+
+### Slice 5 – Performance Dashboard
+**User story:** As a founder, I can see engagement metrics at a glance.
+
+**Features**
+- Mini-KPI cards: total posts, clicks, likes, shares.
+- Recharts graph: engagement over time.
+- Links served through `/r/:id` route to record metrics before redirect.
+
+**Stack**
+- Frontend: Recharts, Tailwind grid.
+- Backend: `/api/metrics` routes + redirect tracker.
+- DB: `Metrics` model in Prisma.
+- Eval checkpoint: data correctness and visual clarity.
+
+---
+
+### Slice 6 – Auth (Optional)
+**User story:** As a founder, I can log in with email or GitHub.
+
+**Features**
+- Passwordless email or OAuth.
+- Session per user.
+
+**Stack**
+- `Auth.js` (NextAuth) + Prisma adapter.
+- Eval checkpoint: basic secure login flow.
+
+---
+
+## 4. Tech Stack Summary
+
+| Layer | Library / Tool | Purpose |
+|-------|----------------|----------|
+| **Frontend** | Next.js 15 (App Router) | UI + API routes |
+|  | Tailwind CSS + shadcn/ui + Radix | Design system |
+|  | dnd-kit | Drag-drop Kanban |
+|  | TanStack Query | Server state caching |
+|  | Zustand | Local UI state |
+|  | Recharts | Charts and KPIs |
+| **Backend** | Prisma + SQLite → Postgres (Neon) | Persistence |
+|  | Next.js API Routes | Business logic |
+|  | Node cron (setInterval) | Scheduling |
+| **AI/Agents** | Claude via AWS Bedrock or Anthropic SDK | Text generation |
+|  | LangGraph (JS) | Agent orchestration |
+| **Content Extraction** | jsdom + @mozilla/readability | HTML → markdown |
+| **Optional** | NextAuth | Auth |
+| **Infra** | Vercel / Localhost | Hosting |
+|  | Fly.io / Railway (if Python microservice) | Optional Claude agent |
+
+---
+
+## 5. Development Workflow (Human-in-Loop)
+
+1. **Pick one slice** below.  
+2. Claude builds the implementation incrementally (UI + API + schema).  
+3. You run locally (`pnpm dev`), evaluate UX + correctness.  
+4. Approve or revise → move to next slice.
+
+**Recommended Order**
+1. Slice 1 – Source Ingestion  
+2. Slice 2 – Kanban Tasks  
+3. Slice 3 – Claude Generation  
+4. Slice 4 – Scheduling  
+5. Slice 5 – Dashboard  
+6. Slice 6 – Auth (optional)
+
+---
+
+## 6. Example Claude Command Prompts
+
+### Build a Slice
+> Implement *Slice 1 – Source Ingestion* from the MLP Spec.  
+> Include both frontend and backend code in Next.js 15 with Prisma models.  
+> Use shadcn/ui and Tailwind for styling.  
+> Output runnable code and brief usage steps.
+
+### Evaluate a Slice
+> Review output from previous slice, run it locally, and suggest UX/code improvements.
+
+---
+
+## 7. Deliverables
+
+Each slice must include:
+- Updated Prisma schema (if needed)
+- Next.js route(s)
+- UI components (page, modal, or board)
+- Example data (seed)
+- Test command to verify flow locally
+
+---
+
+**End of Spec**

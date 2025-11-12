@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Source content model - for Slice 1
+model Source {
+  id          String   @id @default(cuid())
+  url         String?
+  title       String?
+  content     String   // Markdown content
+  rawHtml     String?  // Original HTML
+  excerpt     String?  // Short summary
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations for future slices
+  tasks       Task[]
+}
+
+// Task/Post model - for Slice 2 onwards
+model Task {
+  id          String   @id @default(cuid())
+  sourceId    String?
+  source      Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  platform    String?  // linkedin, twitter, blog, etc.
+  status      String   @default("todo") // todo, draft, scheduled, posted
+  content     String?  // Post text
+  outputJson  String?  // JSON output from Claude
+
+  scheduledAt DateTime?
+  postedAt    DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations for future slices
+  metrics     Metric[]
+}
+
+// Metrics model - for Slice 5
+model Metric {
+  id          String   @id @default(cuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  type        String   // click, like, share, etc.
+  value       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  @@index([taskId])
+}
