@@ -10,6 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Campaign model - for Slice 2
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("active") // active, paused, completed
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tasks       Task[]
+}
+
 // Source content model - for Slice 1
 model Source {
   id          String   @id @default(cuid())
@@ -28,6 +42,8 @@ model Source {
 // Task/Post model - for Slice 2 onwards
 model Task {
   id          String   @id @default(cuid())
+  campaignId  String?
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   sourceId    String?
   source      Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 

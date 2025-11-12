@@ -44,10 +44,14 @@ Automate content → promo generation → scheduling → simple analytics, using
 
 ---
 
-### Slice 2 – Campaign & Task Management (Kanban)
+### Slice 2 – Campaign & Task Management (Kanban) ✅ COMPLETED (v0.2.0)
 **User story:** As a founder, I can create a campaign and view my generated tasks on a drag-drop Kanban board.
 
-**Features**
+**Status:** Implemented and tested
+**Release:** v0.2.0
+**Details:** See `backlog/release-0.2.0.md`
+
+**Features** ✅
 - CRUD for campaigns.
 - Kanban board with columns: *Todo*, *Draft*, *Scheduled*, *Posted*.
 - Drag & drop tasks between columns.
