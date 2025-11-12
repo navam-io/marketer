@@ -12,8 +12,9 @@
  ⚠ `experimental.instrumentationHook` is no longer needed to be configured in Next.js
  ✅ **Completed in v0.4.1** - Removed deprecated experimental.instrumentationHook from next.config.ts as it's now a stable feature in Next.js 15
 
-[ ] When in Campaigns kanban board fix UI refresh when state refreshes for:
+[x] When in Campaigns kanban board fix UI refresh when state refreshes for:
 1. number of tasks listed in campaign name
 2. when post schedule reaches published time and moves to published column
+✅ **Completed in v0.4.3 & v0.4.4** - v0.4.3: Fixed task updates/deletes and added 60-second polling for scheduled posts. v0.4.4: Fixed task creation (manual & AI-generated) to also refresh campaign counts. NOW FULLY FIXED.
 
 [x] When card schedule is assigned it should move to scheduled column with some animation. ✅ **Completed in v0.4.2** - Tasks now automatically move to "Scheduled" column when a schedule is assigned, with smooth 300ms CSS transitions throughout the kanban board

@@ -97,6 +97,19 @@ export default function CampaignsPage() {
     loadData();
   }, [loadData]);
 
+  // Poll for changes every 60 seconds to catch scheduled posts moving to posted
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      // Only poll if a campaign is selected
+      if (selectedCampaignId) {
+        fetchTasks();
+        fetchCampaigns();
+      }
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [selectedCampaignId, fetchTasks, fetchCampaigns]);
+
   const handleTaskUpdate = async (taskId: string, updates: Partial<Task>) => {
     try {
       const response = await fetch(`/api/tasks/${taskId}`, {
@@ -107,8 +120,8 @@ export default function CampaignsPage() {
 
       if (!response.ok) throw new Error('Failed to update task');
 
-      // Refresh tasks
-      await fetchTasks();
+      // Refresh both tasks and campaigns to update task counts
+      await Promise.all([fetchTasks(), fetchCampaigns()]);
     } catch (error) {
       console.error('Error updating task:', error);
       alert('Failed to update task');
@@ -123,12 +136,17 @@ export default function CampaignsPage() {
 
       if (!response.ok) throw new Error('Failed to delete task');
 
-      // Refresh tasks
-      await fetchTasks();
+      // Refresh both tasks and campaigns to update task counts
+      await Promise.all([fetchTasks(), fetchCampaigns()]);
     } catch (error) {
       console.error('Error deleting task:', error);
       alert('Failed to delete task');
     }
+  };
+
+  // Helper to refresh both tasks and campaigns (for task creation/generation)
+  const refreshTasksAndCampaigns = async () => {
+    await Promise.all([fetchTasks(), fetchCampaigns()]);
   };
 
   const selectedCampaign = campaigns.find(c => c.id === selectedCampaignId);
@@ -234,13 +252,13 @@ export default function CampaignsPage() {
         <>
           <CreateTaskDialog
             campaignId={selectedCampaignId}
-            onTaskCreated={fetchTasks}
+            onTaskCreated={refreshTasksAndCampaigns}
           />
           <GenerateContentDialog
             campaignId={selectedCampaignId}
             open={isGenerateContentOpen}
             onOpenChange={setIsGenerateContentOpen}
-            onContentGenerated={fetchTasks}
+            onContentGenerated={refreshTasksAndCampaigns}
           />
         </>
       )}
