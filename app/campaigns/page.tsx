@@ -13,8 +13,9 @@ import {
 import { KanbanBoard } from '@/components/kanban-board';
 import { CreateCampaignDialog } from '@/components/create-campaign-dialog';
 import { CreateTaskDialog } from '@/components/create-task-dialog';
+import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Sparkles } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -49,7 +50,9 @@ export default function CampaignsPage() {
     selectedCampaignId,
     setSelectedCampaignId,
     setIsCreateCampaignOpen,
-    setIsCreateTaskOpen
+    setIsCreateTaskOpen,
+    isGenerateContentOpen,
+    setIsGenerateContentOpen
   } = useAppStore();
 
   const fetchCampaigns = useCallback(async () => {
@@ -191,10 +194,16 @@ export default function CampaignsPage() {
           </Select>
         </div>
         {selectedCampaignId && (
-          <Button onClick={() => setIsCreateTaskOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Task
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsGenerateContentOpen(true)}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Generate with Claude
+            </Button>
+            <Button onClick={() => setIsCreateTaskOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Task
+            </Button>
+          </div>
         )}
       </div>
 
@@ -222,10 +231,18 @@ export default function CampaignsPage() {
 
       <CreateCampaignDialog onCampaignCreated={loadData} />
       {selectedCampaignId && (
-        <CreateTaskDialog
-          campaignId={selectedCampaignId}
-          onTaskCreated={fetchTasks}
-        />
+        <>
+          <CreateTaskDialog
+            campaignId={selectedCampaignId}
+            onTaskCreated={fetchTasks}
+          />
+          <GenerateContentDialog
+            campaignId={selectedCampaignId}
+            open={isGenerateContentOpen}
+            onOpenChange={setIsGenerateContentOpen}
+            onContentGenerated={fetchTasks}
+          />
+        </>
       )}
     </div>
   );

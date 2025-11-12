@@ -35,6 +35,9 @@ interface AppState {
   isCreateTaskOpen: boolean;
   setIsCreateTaskOpen: (open: boolean) => void;
 
+  isGenerateContentOpen: boolean;
+  setIsGenerateContentOpen: (open: boolean) => void;
+
   editingTaskId: string | null;
   setEditingTaskId: (id: string | null) => void;
 
@@ -52,6 +55,9 @@ export const useAppStore = create<AppState>((set) => ({
 
   isCreateTaskOpen: false,
   setIsCreateTaskOpen: (open) => set({ isCreateTaskOpen: open }),
+
+  isGenerateContentOpen: false,
+  setIsGenerateContentOpen: (open) => set({ isGenerateContentOpen: open }),
 
   editingTaskId: null,
   setEditingTaskId: (id) => set({ editingTaskId: id }),

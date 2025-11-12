@@ -64,20 +64,25 @@ Automate content → promo generation → scheduling → simple analytics, using
 
 ---
 
-### Slice 3 – Content Generation (Claude Agent)
+### Slice 3 – Content Generation (Claude Agent) ✅ COMPLETED (v0.3.0)
 **User story:** As a founder, I can select a source and auto-generate social posts for multiple platforms.
 
-**Features**
-- “Generate from Source” modal (choose platforms, tone, CTA).
-- Call Claude (Bedrock or Anthropic) to produce structured JSON output.
+**Status:** Implemented and tested
+**Release:** v0.3.0
+**Details:** See `backlog/release-0.3.0.md`
+
+**Features** ✅
+- "Generate from Source" modal (choose platforms, tone, CTA).
+- Call Claude (Anthropic SDK) to produce structured JSON output.
 - Save drafts to `Task.outputJson`.
+- Multi-platform generation (LinkedIn, Twitter, Blog).
+- Human-in-the-loop review workflow.
 
 **Stack**
-- Backend: `/api/generate` route with LangGraph mini-flow:
-  1. summarize source
-  2. format per platform schema
-- LLM: Claude Sonnet via AWS Bedrock (`@aws-sdk/client-bedrock-runtime`) or Anthropic SDK.
-- Eval checkpoint: quality of generated JSON and tone.
+- Backend: `/api/generate` route with Claude 3.5 Sonnet.
+- LLM: Claude Sonnet via Anthropic SDK (`@anthropic-ai/sdk`).
+- Frontend: `GenerateContentDialog` with platform selection and tone customization.
+- Eval checkpoint: quality of generated JSON and tone ✅ Excellent.
 
 ---
 
