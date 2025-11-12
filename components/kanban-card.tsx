@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Check, X, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ScheduleTaskDialog } from '@/components/schedule-task-dialog';
 
 interface Task {
   id: string;
@@ -41,6 +42,7 @@ const PLATFORM_COLORS: Record<string, string> = {
 export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: KanbanCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(task.content || '');
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
 
   const {
     attributes,
@@ -74,6 +76,10 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
     }
   };
 
+  const handleSchedule = async (taskId: string, scheduledAt: Date | null) => {
+    await onUpdate(taskId, { scheduledAt: scheduledAt || undefined });
+  };
+
   const platformColor = task.platform
     ? PLATFORM_COLORS[task.platform] || PLATFORM_COLORS.default
     : PLATFORM_COLORS.default;
@@ -102,6 +108,18 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
             <div className="flex gap-1">
               {!isEditing && (
                 <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsScheduleDialogOpen(true);
+                    }}
+                    title="Schedule task"
+                  >
+                    <Calendar className="h-3 w-3" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -179,6 +197,14 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
           )}
         </CardContent>
       </Card>
+
+      <ScheduleTaskDialog
+        open={isScheduleDialogOpen}
+        onOpenChange={setIsScheduleDialogOpen}
+        taskId={task.id}
+        currentScheduledAt={task.scheduledAt}
+        onSchedule={handleSchedule}
+      />
     </div>
   );
 }

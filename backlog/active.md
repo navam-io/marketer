@@ -86,19 +86,26 @@ Automate content → promo generation → scheduling → simple analytics, using
 
 ---
 
-### Slice 4 – Scheduling & Mock Posting
-**User story:** As a founder, I can schedule posts for later and see them move automatically to “Posted”.
+### Slice 4 – Scheduling & Mock Posting ✅ COMPLETED (v0.4.0)
+**User story:** As a founder, I can schedule posts for later and see them move automatically to "Posted".
 
-**Features**
+**Status:** Implemented and tested
+**Release:** v0.4.0
+**Details:** See `backlog/release-0.4.0.md`
+
+**Features** ✅
 - Date/time picker on Kanban card.
 - Simple cron loop (in-process timer).
-- Auto-update status → “Posted”.
-- Mock “share” log.
+- Auto-update status → "Posted".
+- Mock "share" log.
+- Background scheduler service.
+- Scheduler API endpoints.
 
 **Stack**
-- Frontend: date picker (`shadcn/ui`).
-- Backend: Node interval job (no external queue yet).
-- Eval checkpoint: accurate state transitions.
+- Frontend: native date/time inputs, schedule dialog (`shadcn/ui`).
+- Backend: Node interval job via `instrumentation.ts`.
+- API: `/api/scheduler/process` for manual and automated processing.
+- Eval checkpoint: accurate state transitions ✅ Excellent (60 tests pass).
 
 ---
 

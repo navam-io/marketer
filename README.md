@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -73,17 +73,58 @@ Organize your social media workflow with an intuitive Kanban board.
 
 </details>
 
-<details>
-<summary><b>🤖 Coming Soon: AI Content Generation</b> <code>v0.3.0</code></summary>
+<details open>
+<summary><b>🤖 AI Content Generation</b> <code>v0.3.0</code></summary>
 
 <br>
 
-Generate platform-optimized posts with Claude AI.
+Generate platform-optimized posts with Claude AI (Sonnet 4.5).
 
-- Multi-platform content generation
-- Tone and CTA customization
-- Structured JSON output
-- Batch generation from sources
+**Multi-Platform Generation**
+- 📱 **LinkedIn**: Professional posts (3000 chars, 3-5 hashtags)
+- 🐦 **Twitter**: Punchy tweets (280 chars, 1-2 hashtags)
+- 📝 **Blog**: Introduction paragraphs (500 chars)
+
+**Customization Options**
+- **Tone Selection:** Professional, Casual, Technical, Enthusiastic
+- **Call-to-Action:** Optional CTA for driving engagement
+- **Source-Based:** Generate from ingested content
+
+**Features**
+- Batch generation for all platforms at once
+- Preview before saving to kanban
+- Tasks created in Draft status for review
+- Powered by Claude Sonnet 4.5 via Anthropic SDK
+
+</details>
+
+<details open>
+<summary><b>⏰ Scheduling & Auto-Posting</b> <code>v0.4.0</code></summary>
+
+<br>
+
+Schedule posts for automatic publishing at future dates/times.
+
+**Scheduling Interface**
+- 📅 **Date/Time Picker**: Native HTML5 inputs for date and time selection
+- 🎯 **Smart Defaults**: Default to next day at 9 AM
+- 🗓️ **Visual Indicators**: Scheduled date displayed on kanban cards
+- ❌ **Clear Schedule**: One-click schedule removal
+
+**Background Automation**
+- ⚡ **Auto-Processing**: Tasks automatically move to "Posted" at scheduled time
+- 🔄 **60-Second Checks**: Background service runs every minute
+- 📊 **Status Tracking**: `postedAt` timestamp recorded for analytics
+- 🛡️ **Robust**: Error handling and logging built-in
+
+**API Endpoints**
+- `GET /api/scheduler/process` - View scheduler status and pending tasks
+- `POST /api/scheduler/process` - Manually trigger scheduled task processing
+
+**Production Ready**
+- Development: In-process scheduler auto-starts
+- Production: Migrate to Vercel Cron Jobs or external cron service
+- Flexible: Works with any hosting platform
 
 </details>
 
@@ -323,13 +364,9 @@ marketer/
 - [x] **v0.2.0** — Campaign & Task Management (Kanban)
 - [x] **v0.3.0** — Content Generation with Claude AI
 - [x] **v0.3.1** — Claude Model Update (Bug Fix)
+- [x] **v0.4.0** — Scheduling & Auto-Posting
 
 ### 📅 Planned
-
-- [ ] **v0.4.0** — Scheduling & Automation
-  - Date/time picker for posts
-  - Automated status transitions
-  - Mock posting functionality
 
 - [ ] **v0.5.0** — Performance Dashboard
   - Engagement metrics

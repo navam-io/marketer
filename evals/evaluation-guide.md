@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.3.1
+**Version:** 0.4.0
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -536,6 +536,291 @@ CTA: (empty)
 
 ---
 
+## Feature 4: Scheduling & Auto-Posting (v0.4.0)
+
+### Test Case 4.1: Verify Scheduling UI Elements
+
+**Prerequisites:**
+- At least one campaign exists
+- At least one task exists in any column
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Select a campaign with existing tasks
+3. Locate any task card
+4. Look for calendar icon button on task card
+
+**Expected Elements:**
+- [ ] Calendar icon visible on each task card
+- [ ] Calendar button is clickable
+- [ ] Hover state indicates button is interactive
+
+**Selectors:**
+- Calendar Button: `button` with calendar icon on task card
+- Task Card: Task container with all action buttons
+
+---
+
+### Test Case 4.2: Open Schedule Task Dialog
+
+**Steps:**
+1. Locate any task card (in any column)
+2. Click the calendar icon button
+3. Wait for dialog to open
+
+**Expected Results:**
+- [ ] Dialog opens with title "Schedule Task" or similar
+- [ ] Date input field visible (type="date")
+- [ ] Time input field visible (type="time")
+- [ ] "Schedule Task" button visible and enabled
+- [ ] "Clear Schedule" button visible (if task already scheduled)
+- [ ] "Cancel" button visible
+- [ ] If task is unscheduled: default date is tomorrow
+- [ ] If task is unscheduled: default time is 09:00
+- [ ] If task already scheduled: current date/time displayed
+
+**Selectors:**
+- Dialog: `[role="dialog"]`
+- Dialog Title: Heading containing "Schedule"
+- Date Input: `input[type="date"]` or `[data-testid="schedule-date-input"]`
+- Time Input: `input[type="time"]` or `[data-testid="schedule-time-input"]`
+- Schedule Button: `button` containing "Schedule Task"
+- Clear Button: `button` containing "Clear Schedule"
+- Cancel Button: `button` containing "Cancel"
+
+**Timing:**
+- Dialog animation: < 300ms
+
+---
+
+### Test Case 4.3: Schedule a Task for Future Date
+
+**Steps:**
+1. Select a task in "Draft" column
+2. Click calendar icon
+3. Wait for dialog to open
+4. Set date: (tomorrow's date - use JavaScript Date API)
+5. Set time: `14:30` (2:30 PM)
+6. Click "Schedule Task" button
+7. Wait for dialog to close
+
+**Expected Results:**
+- [ ] Dialog closes after scheduling
+- [ ] Task moves from "Draft" to "Scheduled" column
+- [ ] Task card shows scheduled date/time at bottom
+- [ ] Scheduled date formatted as human-readable (e.g., "Nov 12, 2025 2:30 PM")
+- [ ] Success message may appear (toast/notification)
+- [ ] Task status is "scheduled"
+
+**Selectors:**
+- Scheduled Column: Column with "Scheduled" header
+- Task Card: Task in Scheduled column
+- Schedule Display: Text showing date/time on task card
+
+**Timing:**
+- Schedule operation: < 500ms
+- Column transition: Smooth animation
+
+---
+
+### Test Case 4.4: Edit Scheduled Task
+
+**Steps:**
+1. Locate a task in "Scheduled" column (from Test 4.3)
+2. Click calendar icon on scheduled task
+3. Wait for dialog to open
+4. Verify current schedule is displayed
+5. Change date to day after tomorrow
+6. Change time to `10:00`
+7. Click "Schedule Task" button
+
+**Expected Results:**
+- [ ] Dialog opens with current scheduled date/time pre-filled
+- [ ] Can edit both date and time
+- [ ] After saving: task remains in "Scheduled" column
+- [ ] Schedule display updates to new date/time
+- [ ] No duplicate tasks created
+
+**Timing:**
+- Update operation: < 500ms
+
+---
+
+### Test Case 4.5: Clear Scheduled Date
+
+**Steps:**
+1. Locate a scheduled task
+2. Click calendar icon
+3. Wait for dialog to open
+4. Click "Clear Schedule" button
+5. Wait for dialog to close
+
+**Expected Results:**
+- [ ] Dialog closes
+- [ ] Task moves from "Scheduled" back to previous status (usually "Draft")
+- [ ] Schedule display removed from task card
+- [ ] Task status changes from "scheduled" to previous status
+- [ ] No schedule date shown on card
+
+**Selectors:**
+- Clear Button: `button` containing "Clear" or "Clear Schedule"
+- Draft Column: Column where task should return
+
+**Timing:**
+- Clear operation: < 500ms
+
+---
+
+### Test Case 4.6: Schedule Validation - Past Dates
+
+**Steps:**
+1. Open schedule dialog on any task
+2. Attempt to set date to yesterday or today (past date)
+3. Observe validation behavior
+
+**Expected Results:**
+- [ ] Date input should have `min` attribute set to today
+- [ ] Browser prevents selecting past dates (native validation)
+- [ ] If past date somehow selected: error message or validation
+- [ ] Cannot submit with invalid date
+
+**Note:** This test depends on browser's native date input validation.
+
+---
+
+### Test Case 4.7: Automatic Task Posting (Time-Based)
+
+**Important:** This test requires waiting for the scheduled time to pass, or manually triggering the scheduler.
+
+**Option A: Short Wait Test (Manual Testing)**
+
+**Steps:**
+1. Create a new task in "Draft" column
+2. Schedule it for 2 minutes in the future (current time + 2 min)
+3. Click "Schedule Task"
+4. Wait 2-3 minutes
+5. Refresh page or observe kanban board
+
+**Expected Results:**
+- [ ] After scheduled time passes (within 60 seconds):
+  - [ ] Task automatically moves to "Posted" column
+  - [ ] Task status changes to "posted"
+  - [ ] `postedAt` timestamp recorded
+- [ ] No manual intervention required
+- [ ] Transition happens in background
+
+**Option B: API Test (Automated Testing)**
+
+**Steps:**
+1. Create task scheduled for past time (via API or database)
+2. Call scheduler API manually: `POST /api/scheduler/process`
+3. Verify task moved to "Posted"
+
+**API Endpoint:**
+```
+POST http://localhost:3000/api/scheduler/process
+```
+
+**Expected Response:**
+```json
+{
+  "message": "Processed 1 scheduled tasks",
+  "successCount": 1,
+  "failureCount": 0,
+  "results": [...]
+}
+```
+
+**Selectors:**
+- Posted Column: Column with "Posted" header
+- Task Card: Task in Posted column
+- Posted Timestamp: May show "Posted at [time]" on card
+
+**Timing:**
+- Background scheduler: Runs every 60 seconds
+- Processing: < 500ms per task
+- Max delay: 60 seconds from scheduled time
+
+---
+
+### Test Case 4.8: Schedule Multiple Tasks
+
+**Steps:**
+1. Create 3 tasks in Draft column
+2. Schedule Task 1 for tomorrow at 09:00
+3. Schedule Task 2 for tomorrow at 14:00
+4. Schedule Task 3 for day after tomorrow at 10:00
+5. Verify all tasks in Scheduled column
+
+**Expected Results:**
+- [ ] All 3 tasks appear in "Scheduled" column
+- [ ] Each shows correct scheduled date/time
+- [ ] Tasks sorted by scheduled date (optional)
+- [ ] Each can be individually edited or cleared
+- [ ] No conflicts between scheduled tasks
+
+---
+
+### Test Case 4.9: Scheduler Status API
+
+**Steps:**
+1. Ensure at least one task is scheduled for future
+2. Make GET request to scheduler API
+
+**API Endpoint:**
+```
+GET http://localhost:3000/api/scheduler/process
+```
+
+**Expected Response:**
+```json
+{
+  "dueNow": 0,
+  "scheduledFuture": 1,
+  "nextTask": {
+    "id": "...",
+    "platform": "linkedin",
+    "scheduledAt": "2025-11-12T14:30:00.000Z",
+    "timeUntilPost": "2 hours"
+  }
+}
+```
+
+**Assertions:**
+- [ ] Response includes `dueNow` count (tasks ready to post)
+- [ ] Response includes `scheduledFuture` count (tasks scheduled later)
+- [ ] If tasks exist: `nextTask` object with details
+- [ ] `timeUntilPost` is human-readable
+
+**Note:** This is primarily an API test, not browser UI test.
+
+---
+
+### Test Case 4.10: Integration with Drag & Drop
+
+**Steps:**
+1. Create a task in "Draft"
+2. Schedule it for tomorrow (should move to "Scheduled")
+3. Manually drag the scheduled task back to "Draft"
+4. Verify scheduled date is cleared
+
+**Expected Results:**
+- [ ] Can drag scheduled task to other columns
+- [ ] Dragging to non-"Scheduled" column clears schedule
+- [ ] Schedule display removed when moved
+- [ ] Can re-schedule task after manual move
+
+**Alternative Flow:**
+5. Drag a "Draft" task to "Scheduled" column
+6. Verify schedule dialog opens (or date picker appears)
+
+**Expected:**
+- [ ] May auto-open schedule dialog
+- [ ] OR: Requires manual calendar click after drag
+- [ ] Task remains in target column
+
+---
+
 ## End-to-End Workflow Test
 
 ### Complete User Journey
@@ -557,24 +842,35 @@ CTA: (empty)
 10. Wait for 3 tasks to appear in Draft
 11. Verify 5 total tasks in Draft column
 
-**Day 3: Content Management**
+**Day 3: Content Management & Scheduling**
 
 12. Edit one task's content inline
-13. Drag 2 tasks from Draft to Scheduled
-14. Drag 1 task from Scheduled to Posted
-15. Delete 1 task from Draft
-16. Verify final state:
+13. Select one task from Draft, click calendar icon
+14. Schedule it for tomorrow at 9:00 AM
+15. Verify task moved to "Scheduled" column with date displayed
+16. Select another task from Draft, click calendar icon
+17. Schedule it for tomorrow at 2:00 PM
+18. Manually drag 1 task from Draft to Posted
+19. Delete 1 task from Draft
+20. Verify final state:
     - [ ] 1 task in Draft
-    - [ ] 2 tasks in Scheduled
+    - [ ] 2 tasks in Scheduled (both showing scheduled dates)
     - [ ] 1 task in Posted
     - [ ] Total: 4 tasks (1 deleted)
 
 **Day 4: Verify Persistence**
 
-17. Refresh page (`F5` or reload)
-18. Verify all tasks still in correct columns
-19. Verify edited content persisted
-20. Verify campaign still selected
+21. Refresh page (`F5` or reload)
+22. Verify all tasks still in correct columns
+23. Verify edited content persisted
+24. Verify scheduled dates persisted
+25. Verify campaign still selected
+
+**Day 5: Test Auto-Posting (Optional)**
+
+26. Edit one scheduled task to be 2 minutes in the future
+27. Wait 2-3 minutes
+28. Verify task automatically moved to "Posted" column
 
 ---
 
@@ -629,6 +925,28 @@ CTA: (empty)
 - [ ] Generated tasks can be edited
 - [ ] Generated tasks can be moved
 - [ ] Generated tasks can be deleted
+
+### Feature 4: Scheduling & Auto-Posting ✓
+- [ ] Calendar icon appears on all task cards
+- [ ] Schedule dialog opens when calendar clicked
+- [ ] Date input works (native HTML5)
+- [ ] Time input works (native HTML5)
+- [ ] Smart defaults (tomorrow at 9 AM)
+- [ ] Can schedule task for future date/time
+- [ ] Task moves to "Scheduled" column when scheduled
+- [ ] Scheduled date/time displays on card
+- [ ] Can edit scheduled date/time
+- [ ] Can clear schedule
+- [ ] Task returns to previous status when schedule cleared
+- [ ] Schedule display removed when cleared
+- [ ] Cannot schedule in the past (validation)
+- [ ] Multiple tasks can be scheduled
+- [ ] Each scheduled task shows its own date/time
+- [ ] Scheduled tasks automatically move to "Posted" at scheduled time
+- [ ] Background scheduler runs every 60 seconds
+- [ ] Scheduler API endpoints work (GET/POST)
+- [ ] Scheduled tasks can be manually dragged to other columns
+- [ ] Scheduled dates persist after page refresh
 
 ---
 
@@ -690,10 +1008,20 @@ CTA: (empty)
 
 **Content Generation:**
 - Generate Button: `button` containing "Generate from Source"
-- Source Select: `select[name="sourceId"]`
-- Platform Checkbox: `input[type="checkbox"][value="linkedin"]` etc.
-- Tone Select: `select[name="tone"]`
-- CTA Input: `input[name="cta"]`
+- Source Select: `select[name="sourceId"]` or `[data-testid="generate-source-select"]`
+- Platform Checkbox: `input[type="checkbox"]` or `[data-testid="generate-platform-linkedin"]`
+- Tone Select: `select[name="tone"]` or `[data-testid="generate-tone-select"]`
+- CTA Input: `input[name="cta"]` or `[data-testid="generate-cta-input"]`
+
+**Scheduling:**
+- Calendar Button: `button` with calendar icon on task card
+- Schedule Dialog: `[role="dialog"]` containing "Schedule"
+- Date Input: `input[type="date"]` or `[data-testid="schedule-date-input"]`
+- Time Input: `input[type="time"]` or `[data-testid="schedule-time-input"]`
+- Schedule Button: `button` containing "Schedule Task"
+- Clear Schedule Button: `button` containing "Clear Schedule"
+- Schedule Display: Text on task card showing scheduled date/time
+- Scheduled Column: Column with "Scheduled" or "📅 Scheduled" header
 
 ---
 
@@ -720,6 +1048,15 @@ CTA: (empty)
 - Multiple platforms: 10-20 seconds
 - Loading indicator should appear immediately
 
+**Scheduling:**
+- Schedule dialog open: < 300ms
+- Schedule task operation: < 500ms
+- Clear schedule operation: < 500ms
+- Task move to Scheduled column: Smooth animation (< 500ms)
+- Background scheduler check: Every 60 seconds
+- Auto-posting processing: < 500ms per task
+- Max delay for auto-posting: 60 seconds from scheduled time
+
 ### Wait Strategies
 
 **For Source Fetch:**
@@ -745,6 +1082,13 @@ CTA: (empty)
 - Wait for kanban board to render
 - Wait for tasks to appear
 - Verify data persistence
+
+**For Scheduling:**
+- Wait for schedule dialog to open (< 300ms)
+- Wait for task to move to Scheduled column (< 500ms)
+- Wait for schedule display to update on card
+- For auto-posting test: Wait up to 3 minutes (scheduled time + 60s buffer)
+- Verify task in correct column after scheduling
 
 ---
 
@@ -774,13 +1118,26 @@ CTA: (empty)
 15. Test Case 3.4: Multiple platform generation
 16. Test Case 3.5: Different tones
 
-**Phase 4: Integration**
-17. End-to-End Workflow Test
+**Phase 4: Scheduling (Feature 4)**
+17. Test Case 4.1: Verify scheduling UI elements
+18. Test Case 4.2: Open schedule dialog
+19. Test Case 4.3: Schedule a task
+20. Test Case 4.4: Edit scheduled task
+21. Test Case 4.5: Clear schedule
+22. Test Case 4.8: Schedule multiple tasks
+23. Test Case 4.10: Drag & drop integration
 
-**Phase 5: Persistence**
-18. Refresh browser
-19. Verify all data persisted
-20. Verify state maintained
+**Phase 5: Integration**
+24. End-to-End Workflow Test
+
+**Phase 6: Persistence**
+25. Refresh browser
+26. Verify all data persisted
+27. Verify scheduled dates maintained
+28. Verify state maintained
+
+**Phase 7: Auto-Posting (Optional)**
+29. Test Case 4.7: Automatic task posting (requires time wait or API call)
 
 ---
 
