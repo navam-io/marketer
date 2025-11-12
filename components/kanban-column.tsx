@@ -21,8 +21,8 @@ export function KanbanColumn({ id, title, count, color, children }: KanbanColumn
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-col rounded-lg border-2 p-4 min-h-[400px] transition-colors",
-        isOver ? "border-blue-500 bg-blue-50" : "border-slate-200 bg-white"
+        "flex flex-col rounded-lg border-2 p-4 min-h-[400px] transition-all duration-300 ease-in-out",
+        isOver ? "border-blue-500 bg-blue-50 scale-[1.02]" : "border-slate-200 bg-white"
       )}
     >
       <div className="mb-4">
@@ -37,7 +37,7 @@ export function KanbanColumn({ id, title, count, color, children }: KanbanColumn
           </span>
         </div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 transition-all duration-300 ease-in-out">
         {children}
       </div>
     </div>

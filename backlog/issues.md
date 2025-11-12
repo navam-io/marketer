@@ -4,7 +4,7 @@
 
 [x] I used Playwright to test this web app. The evaulation guide and resulting evaluation report is present in evals/ folder. Note the issues which blocked Playwright from performing automated browser testing of the web app and fix these issues. ✅ **Completed in v0.3.2** - Added data-testid attributes to all form components for reliable automated testing
 
-[ ] When in Campaigns kanban board with active campaign and few task cards, if user drags and drops a card to another column over another card, the dragged card disappears. Ideal behaviour is that as the user drags the card over another card, the cards ease animate up and/or down to make an empty space for the card being dragged to drop and as card is dropped it appears in the space created for it. If it is instead dragged back to the original position then nothing happens. Same behavior should happen if card is dragged over other cards in same column to enable sequence changes. The columns receiving/sending cards should also animate ease in/out expand/contract.
+[ ] When in Campaigns kanban board with active campaign and few task cards, if user drags and drops a card to another column over another card, the dragged card disappears. Ideal behaviour is that as the user drags the card over another card, the cards ease animate up and/or down (like rubberband effect) to make an empty space for the card being dragged to drop and as card is dropped it appears in the space created for it. If it is instead dragged back to the original position then all cards return to their original position. The columns receiving/sending cards should also animate ease in/out expand/contract unless cards are being moved within same column to change sequencing.
 
 [x] Fix this build warning  ⚠ Invalid next.config.ts options detected:
  ⚠     Unrecognized key(s) in object: 'instrumentationHook' at "experimental"
@@ -15,3 +15,5 @@
 [ ] When in Campaigns kanban board fix UI refresh when state refreshes for:
 1. number of tasks listed in campaign name
 2. when post schedule reaches published time and moves to published column
+
+[x] When card schedule is assigned it should move to scheduled column with some animation. ✅ **Completed in v0.4.2** - Tasks now automatically move to "Scheduled" column when a schedule is assigned, with smooth 300ms CSS transitions throughout the kanban board

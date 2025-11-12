@@ -77,7 +77,13 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
   };
 
   const handleSchedule = async (taskId: string, scheduledAt: Date | null) => {
-    await onUpdate(taskId, { scheduledAt: scheduledAt || undefined });
+    // When scheduling a task, automatically move it to 'scheduled' status
+    // When clearing schedule, move it back to 'draft' status
+    const updates: Partial<Task> = {
+      scheduledAt: scheduledAt || undefined,
+      status: scheduledAt ? 'scheduled' : 'draft'
+    };
+    await onUpdate(taskId, updates);
   };
 
   const platformColor = task.platform
@@ -95,7 +101,7 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
         (isDragging || isSortableDragging) && "opacity-50"
       )}
     >
-      <Card className="cursor-move hover:shadow-md transition-shadow">
+      <Card className="cursor-move hover:shadow-md transition-all duration-300 ease-in-out">
         <CardHeader className="p-3 pb-2">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
