@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -18,7 +19,7 @@ import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -227,6 +228,12 @@ export default function CampaignsPage() {
           <p className="text-slate-600 mt-1">Manage your marketing campaigns, tasks, and performance</p>
         </div>
         <div className="flex gap-3">
+          <Link href="/sources">
+            <Button variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              Manage Sources
+            </Button>
+          </Link>
           <Button onClick={() => setIsCreateCampaignOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Campaign

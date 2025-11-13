@@ -62,6 +62,66 @@ describe('Database Integration Tests', () => {
       expect(source.url).toBeNull();
       expect(source.content).toBe('Direct text input');
     });
+
+    it('should delete a source', async () => {
+      const source = await createTestSource();
+
+      await prismaTest.source.delete({
+        where: { id: source.id }
+      });
+
+      const deleted = await prismaTest.source.findUnique({
+        where: { id: source.id }
+      });
+
+      expect(deleted).toBeNull();
+    });
+
+    it('should set sourceId to null on tasks when source is deleted', async () => {
+      const source = await createTestSource();
+      const task = await createTestTask({ sourceId: source.id });
+
+      // Verify task is linked to source
+      const taskBefore = await prismaTest.task.findUnique({
+        where: { id: task.id }
+      });
+      expect(taskBefore?.sourceId).toBe(source.id);
+
+      // Delete source
+      await prismaTest.source.delete({
+        where: { id: source.id }
+      });
+
+      // Verify task still exists but sourceId is null (onDelete: SetNull)
+      const taskAfter = await prismaTest.task.findUnique({
+        where: { id: task.id }
+      });
+      expect(taskAfter).toBeTruthy();
+      expect(taskAfter?.sourceId).toBeNull();
+    });
+
+    it('should allow deleting source with multiple tasks', async () => {
+      const source = await createTestSource();
+      const task1 = await createTestTask({ sourceId: source.id });
+      const task2 = await createTestTask({ sourceId: source.id });
+      const task3 = await createTestTask({ sourceId: source.id });
+
+      await prismaTest.source.delete({
+        where: { id: source.id }
+      });
+
+      // All tasks should still exist
+      const tasks = await prismaTest.task.findMany({
+        where: {
+          id: { in: [task1.id, task2.id, task3.id] }
+        }
+      });
+
+      expect(tasks).toHaveLength(3);
+      tasks.forEach(task => {
+        expect(task.sourceId).toBeNull();
+      });
+    });
   });
 
   describe('Campaign Management (Slice 2)', () => {

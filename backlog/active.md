@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.6.0
+**Current Version:** v0.7.1
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature slices have been implemented with excellent test coverage (75 tests, 100% pass rate).
+The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature slices have been implemented with excellent test coverage (78 tests, 100% pass rate).
 
 **Original Slices Completed:**
 - ✅ Slice 1: Source Ingestion (v0.1.0)
@@ -19,8 +19,8 @@ The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature sl
 - ✅ Slice 5: Performance Dashboard (v0.6.0)
 
 **Achievement Highlights:**
-- 🚀 5 releases in rapid iteration
-- 🧪 75 integration tests, 100% pass rate, <1s execution
+- 🚀 7 releases in rapid iteration (including patches v0.7.0 & v0.7.1)
+- 🧪 78 integration tests, 100% pass rate, <1s execution
 - 📦 Full tech stack: Next.js 15, Prisma, Claude AI, dnd-kit, Recharts
 - 📚 Comprehensive documentation and release notes
 
@@ -73,44 +73,40 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-## Active Improvements
+### ✅ v0.7.1 - Source Management (RELEASED 2025-11-13)
 
-### 🚧 v0.7.x - Continued UX Improvements (IN PLANNING)
+**Theme:** Source management and navigation completeness
+
+#### ✅ P0-2: Add Source Management Page
+**Status:** Complete (Released in v0.7.1)
+**Released:** 2025-11-13
+**Problem:** No way to navigate back to sources, can't manage multiple sources effectively
+**Solution:** Dedicated `/sources` page with full CRUD UI
+
+**Implementation:**
+- ✅ Created `GET /api/source` endpoint to list all sources
+- ✅ Created `DELETE /api/source/[id]` endpoint
+- ✅ Created `components/source-card.tsx` component
+- ✅ Created `app/sources/page.tsx` with responsive grid
+- ✅ Added delete confirmation dialog with task warning
+- ✅ Added "Manage Sources" button on campaigns page
+- ✅ Added auto-redirect to `/sources` after fetch
+- ✅ Integration tests for source deletion and cascade behavior
+
+**Results:**
+- All 78 tests passing (+3 new)
+- No regressions
+- Complete source navigation flow
+- Safe deletion with cascade (tasks preserved, sourceId nulled)
+- Empty state onboarding
+
+**See:** `backlog/release-0.7.1.md` for full details
 
 ---
 
-#### 🔴 P0-2: Add Source Management Page
-**Status:** Planned
-**Problem:** No way to navigate back to sources, can't manage multiple sources effectively
-**Goal:** Dedicated page for viewing, managing, and generating from sources
+## Active Improvements
 
-**Implementation Plan:**
-- Create `/sources` page listing all ingested sources
-- Show source cards: title, URL, created date, task count
-- Add "Generate from Source" action on each card
-- Add "Delete Source" with confirmation dialog
-- Add navigation link: "Manage Sources"
-- Redirect from home page after fetch to `/sources`
-
-**Files to Create:**
-- `app/sources/page.tsx` - Source management page
-- `components/source-card.tsx` - Individual source display card
-
-**Files to Modify:**
-- `app/page.tsx` - Redirect to /sources after successful fetch
-- Add navigation link to sources in page headers
-
-**API Changes:**
-- Add `DELETE /api/source/[id]` endpoint
-- Existing `GET /api/source` already lists all sources
-
-**Tests:**
-- Integration tests for source deletion
-- Integration tests for cascade behavior (tasks remain, sourceId nulled)
-- Component tests for source cards
-
-**Estimated Effort:** 3-4 hours
-**Expected Release:** v0.7.0
+### 🚧 v0.7.x - Continued UX Improvements (IN PLANNING)
 
 ---
 

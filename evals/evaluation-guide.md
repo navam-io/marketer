@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.7.0
+**Version:** 0.7.1
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -1716,6 +1716,430 @@ test('should filter metrics by campaign', async ({ page }) => {
   // Verify Campaign 2 metrics (25 clicks)
   const clicks2 = await page.locator('.card:has-text("Total Clicks")').textContent();
   expect(clicks2).toContain('25');
+});
+```
+
+---
+
+## Feature 7: Source Management (v0.7.1)
+
+### Test Case 7.1: Navigate to Sources Page from Campaigns
+
+**Steps:**
+1. Navigate to `http://localhost:3000/campaigns`
+2. Locate "Manage Sources" button in header
+3. Click "Manage Sources" button
+4. Wait for sources page to load
+
+**Expected Results:**
+- [ ] "Manage Sources" button visible in campaigns header
+- [ ] Button has FileText icon
+- [ ] Click navigates to `/sources` URL
+- [ ] Sources page loads successfully
+- [ ] Page title visible
+
+**Selectors:**
+- Manage Sources Button: `a[href="/sources"]` or `button:has-text("Manage Sources")`
+- Sources Page Title: `h1` or heading with "Sources"
+
+---
+
+### Test Case 7.2: Verify Sources Page Empty State
+
+**URL:** `http://localhost:3000/sources`
+
+**Prerequisites:** No sources in database (clean state)
+
+**Expected Elements:**
+- [ ] Empty state message visible
+- [ ] Helpful onboarding text
+- [ ] "Add Your First Source" button visible
+- [ ] Button links to home page
+- [ ] Friendly, encouraging message
+
+**Expected Text Content:**
+- Message about no sources yet
+- Instructions to add first source
+- Clear call-to-action
+
+**Selectors:**
+- Empty State Container: `.empty-state` or card with message
+- Add Source Button: `button` or link containing "Add" and "Source"
+- Home Link: `a[href="/"]`
+
+---
+
+### Test Case 7.3: Verify Source Cards Display
+
+**URL:** `http://localhost:3000/sources`
+
+**Prerequisites:** At least 2 sources exist (from Feature 1 tests)
+
+**Expected Elements:**
+- [ ] Responsive grid layout (1/2/3 columns based on screen size)
+- [ ] Source cards visible for each source
+- [ ] Each card shows:
+  - [ ] Title (or "Untitled Source" if missing)
+  - [ ] URL as clickable external link
+  - [ ] Content preview (first 200 chars)
+  - [ ] Creation date
+  - [ ] Task count (e.g., "3 tasks")
+  - [ ] "Generate from Source" button with Sparkles icon
+  - [ ] Delete button (trash icon)
+
+**Card Styling:**
+- Hover effects on cards
+- Platform badges if applicable
+- Proper spacing and padding
+- Responsive design
+
+**Selectors:**
+- Sources Grid: Container with multiple cards
+- Source Card: `.source-card` or card component
+- Card Title: Heading in card
+- Card URL: `a[target="_blank"]` with external link
+- Content Preview: Text area with truncated content
+- Metadata: Creation date and task count
+- Generate Button: `button` containing "Generate"
+- Delete Button: `button` with trash icon
+
+---
+
+### Test Case 7.4: Click Source URL (External Link)
+
+**Steps:**
+1. Navigate to `/sources`
+2. Locate any source card
+3. Click the URL link in card
+4. Verify new tab opens
+
+**Expected Results:**
+- [ ] Link has `target="_blank"`
+- [ ] Link has `rel="noopener noreferrer"` for security
+- [ ] Clicking opens URL in new browser tab
+- [ ] Original tab remains on sources page
+- [ ] External site loads correctly
+
+**Selectors:**
+- Source URL Link: `a[target="_blank"][href^="http"]`
+
+**Note:** This test requires handling new browser context/tab in Playwright.
+
+---
+
+### Test Case 7.5: Generate from Source (via Sources Page)
+
+**Steps:**
+1. Navigate to `/sources`
+2. Ensure a campaign is selected (check in app state)
+3. Click "Generate from Source" button on any source card
+4. Wait for GenerateContentDialog to open
+5. Verify source is pre-selected
+
+**Expected Results:**
+- [ ] Generate button triggers dialog
+- [ ] GenerateContentDialog opens
+- [ ] Source dropdown pre-filled with clicked source
+- [ ] Can proceed with generation (same as Feature 3)
+
+**If No Campaign Selected:**
+- [ ] Alert or message appears
+- [ ] Message states "Please select a campaign first"
+- [ ] User directed to campaigns page
+- [ ] Generate dialog does not open
+
+**Selectors:**
+- Generate Button: `button` with Sparkles icon, text "Generate from Source"
+- Alert: Alert or toast notification
+- Dialog: `[role="dialog"]` for generation
+
+---
+
+### Test Case 7.6: Delete Source - With No Tasks
+
+**Steps:**
+1. Navigate to `/sources`
+2. Create a new source (or use one with 0 tasks)
+3. Click delete button (trash icon)
+4. Wait for confirmation dialog
+5. Verify dialog shows "0 tasks"
+6. Click "Delete" to confirm
+7. Wait for deletion to complete
+
+**Expected Results:**
+- [ ] Delete button triggers confirmation dialog
+- [ ] Dialog title: "Delete Source" or similar
+- [ ] Dialog shows source title
+- [ ] Dialog shows task count: "0 tasks"
+- [ ] Warning message visible
+- [ ] "Delete" button enabled
+- [ ] "Cancel" button visible
+- [ ] After deletion:
+  - [ ] Dialog closes
+  - [ ] Source card removed from grid
+  - [ ] Source no longer visible
+  - [ ] Smooth removal animation
+
+**Selectors:**
+- Delete Button: `button` with trash icon on source card
+- Confirmation Dialog: `[role="dialog"]` or `.dialog`
+- Task Count: Text showing "0 tasks" or "X tasks"
+- Delete Confirm Button: `button` containing "Delete" in dialog
+- Cancel Button: `button` containing "Cancel"
+
+**Timing:**
+- Delete operation: < 500ms
+- UI update: Smooth animation
+
+---
+
+### Test Case 7.7: Delete Source - With Associated Tasks
+
+**Steps:**
+1. Navigate to `/sources`
+2. Generate content from a source (creates tasks)
+3. Verify source card shows task count > 0 (e.g., "3 tasks")
+4. Click delete button on that source
+5. Wait for confirmation dialog
+6. Read warning message
+7. Click "Delete" to confirm
+8. Verify tasks still exist but sourceId is null
+
+**Expected Results:**
+- [ ] Dialog shows correct task count
+- [ ] Warning message: "Tasks will not be deleted, but will no longer be linked to this source"
+- [ ] Warning clearly explains cascade behavior
+- [ ] After deletion:
+  - [ ] Source removed from sources page
+  - [ ] Tasks still visible in campaigns page
+  - [ ] Tasks have no source association
+  - [ ] No data loss
+
+**Database Verification (via API or integration test):**
+- [ ] Source deleted from database
+- [ ] Tasks exist with `sourceId = null`
+- [ ] Tasks linked to campaign still
+- [ ] Metrics preserved
+
+**Selectors:**
+- Warning Text: Element in dialog containing "Tasks will not be deleted"
+- Task Count Display: Text showing task count in dialog
+
+---
+
+### Test Case 7.8: Auto-Redirect After Source Fetch
+
+**Steps:**
+1. Navigate to `http://localhost:3000` (home page)
+2. Enter URL in source ingestion form
+3. Click "Fetch" button
+4. Wait for content to be fetched and displayed
+5. Wait 1.5 seconds for feedback
+6. Observe automatic redirect
+
+**Expected Results:**
+- [ ] Content displays briefly (1.5 seconds)
+- [ ] Success message visible
+- [ ] Automatic redirect to `/sources` occurs
+- [ ] User sees newly added source in sources grid
+- [ ] No manual navigation required
+- [ ] Workflow feels seamless
+
+**Selectors:**
+- Success Message: Toast or alert after fetch
+- Sources URL: Verify URL becomes `/sources`
+- New Source Card: Newest card in grid (check timestamp)
+
+**Timing:**
+- Display time: 1.5 seconds
+- Redirect: Smooth transition
+
+---
+
+### Test Case 7.9: Sources Page Navigation Links
+
+**URL:** `http://localhost:3000/sources`
+
+**Expected Elements:**
+- [ ] "Home" button visible in header
+- [ ] "Add Source" button visible
+- [ ] Both buttons navigate correctly
+
+**Navigation Tests:**
+
+**Home Button:**
+1. Click "Home" button
+2. Verify navigation to `/` (home page)
+3. Source ingestion form visible
+
+**Add Source Button:**
+1. Click "Add Source" button
+2. Should navigate to home page (same as Home)
+3. Allows user to add another source
+
+**Selectors:**
+- Home Button: `a[href="/"]` or `button` with "Home"
+- Add Source Button: `a[href="/"]` or button with "Add Source"
+
+---
+
+### Test Case 7.10: Verify Cascade Behavior (Integration Test)
+
+**Purpose:** Verify database cascade behavior (onDelete: SetNull)
+
+**Note:** This is primarily a database integration test, not browser UI test.
+
+**Setup:**
+1. Create source via API or browser
+2. Generate 3 tasks from source
+3. Verify tasks linked to source (via API)
+4. Delete source (via browser or API)
+5. Query tasks (via API)
+
+**Expected Results:**
+- [ ] Source deleted successfully
+- [ ] All 3 tasks still exist in database
+- [ ] Each task has `sourceId = null`
+- [ ] Tasks still linked to campaign
+- [ ] No foreign key constraint errors
+- [ ] No data loss besides source
+
+**API Verification:**
+```javascript
+// Check tasks after source deletion
+const tasks = await prisma.task.findMany({
+  where: { id: { in: [task1.id, task2.id, task3.id] } }
+});
+
+expect(tasks).toHaveLength(3);
+tasks.forEach(task => {
+  expect(task.sourceId).toBeNull();
+  expect(task.campaignId).not.toBeNull();
+});
+```
+
+---
+
+### Test Case 7.11: Multiple Sources Grid Layout
+
+**Steps:**
+1. Navigate to `/sources`
+2. Ensure 6+ sources exist (create if needed)
+3. Observe grid layout at different screen sizes
+
+**Expected Results:**
+- [ ] Desktop (wide): 3 columns
+- [ ] Tablet (medium): 2 columns
+- [ ] Mobile (narrow): 1 column
+- [ ] Responsive breakpoints work correctly
+- [ ] Cards maintain aspect ratio
+- [ ] No layout breaks or overlaps
+- [ ] Smooth resizing behavior
+
+**Selectors:**
+- Grid Container: Container with responsive grid classes
+- Source Cards: Multiple cards in grid
+
+**Responsive Testing:**
+- Test at 1920px width (desktop)
+- Test at 768px width (tablet)
+- Test at 375px width (mobile)
+
+---
+
+### Playwright Test Example: Source Management
+
+```javascript
+test('should display sources page with sources', async ({ page }) => {
+  // Setup: Create 2 sources
+  const source1 = await createTestSource({
+    title: 'Test Article 1',
+    url: 'https://example.com/article1'
+  });
+  const source2 = await createTestSource({
+    title: 'Test Article 2',
+    url: 'https://example.com/article2'
+  });
+
+  // Navigate to sources page
+  await page.goto('http://localhost:3000/sources');
+
+  // Wait for page load
+  await page.waitForSelector('h1');
+
+  // Verify source cards visible
+  const sourceCards = page.locator('.source-card');
+  await expect(sourceCards).toHaveCount(2);
+
+  // Verify first source card content
+  const firstCard = sourceCards.first();
+  await expect(firstCard).toContainText('Test Article 1');
+  await expect(firstCard).toContainText('https://example.com/article1');
+  await expect(firstCard.locator('button:has-text("Generate")')).toBeVisible();
+  await expect(firstCard.locator('button[aria-label="Delete"]')).toBeVisible();
+});
+
+test('should delete source with confirmation', async ({ page }) => {
+  const source = await createTestSource({ title: 'To Delete' });
+
+  await page.goto('http://localhost:3000/sources');
+
+  // Click delete button
+  const deleteButton = page.locator('button[aria-label="Delete"]').first();
+  await deleteButton.click();
+
+  // Wait for confirmation dialog
+  await page.waitForSelector('[role="dialog"]');
+
+  // Verify dialog content
+  await expect(page.locator('[role="dialog"]')).toContainText('Delete Source');
+  await expect(page.locator('[role="dialog"]')).toContainText('To Delete');
+
+  // Confirm deletion
+  await page.click('button:has-text("Delete")');
+
+  // Wait for dialog to close
+  await page.waitForSelector('[role="dialog"]', { state: 'hidden' });
+
+  // Verify source removed
+  await expect(page.locator('text="To Delete"')).not.toBeVisible();
+});
+
+test('should redirect after source fetch', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+
+  // Fetch source
+  await page.fill('input[type="url"]', 'https://www.paulgraham.com/startupideas.html');
+  await page.click('button:has-text("Fetch")');
+
+  // Wait for fetch to complete
+  await page.waitForSelector('text=/success/i', { timeout: 10000 });
+
+  // Wait for automatic redirect to sources page
+  await page.waitForURL('http://localhost:3000/sources', { timeout: 5000 });
+
+  // Verify on sources page
+  await expect(page).toHaveURL('http://localhost:3000/sources');
+
+  // Verify new source appears
+  await expect(page.locator('text="Startup Ideas"')).toBeVisible();
+});
+
+test('should show empty state when no sources', async ({ page }) => {
+  // Ensure database is empty
+  await cleanDatabase();
+
+  await page.goto('http://localhost:3000/sources');
+
+  // Verify empty state
+  await expect(page.locator('text=/no sources/i')).toBeVisible();
+  await expect(page.locator('button:has-text("Add Your First Source")')).toBeVisible();
+
+  // Click add source button
+  await page.click('button:has-text("Add Your First Source")');
+
+  // Verify navigation to home
+  await expect(page).toHaveURL('http://localhost:3000');
 });
 ```
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,7 @@ interface Source {
 }
 
 export function SourceIngestion() {
+  const router = useRouter();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState<Source | null>(null);
@@ -50,6 +52,11 @@ export function SourceIngestion() {
       }
 
       setSource(data.source);
+
+      // Redirect to sources page after successful fetch
+      setTimeout(() => {
+        router.push('/sources');
+      }, 1500); // Give user time to see the success message
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

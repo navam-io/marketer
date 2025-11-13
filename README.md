@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.7.1-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -190,6 +190,43 @@ Manage campaigns, tasks, and performance metrics all in one place with seamless 
 - `/dashboard` URL redirects to unified campaigns page
 - Built with Radix UI Tabs for accessibility
 - Real-time updates on tab switch
+
+</details>
+
+<details open>
+<summary><b>📚 Source Management</b> <code>v0.7.1</code></summary>
+
+<br>
+
+Dedicated page for managing all your ingested content sources with full CRUD operations.
+
+**Source Management Page**
+- 🗂️ **View All Sources**: Responsive grid showing all ingested sources
+- 📄 **Source Cards**: Display title, URL, content preview, creation date, task count
+- ✨ **Generate from Source**: One-click content generation button on each card
+- 🗑️ **Safe Deletion**: Delete sources with confirmation dialog and task warning
+- 📭 **Empty State**: Helpful onboarding when no sources exist
+
+**Navigation & Workflow**
+- 🔗 **"Manage Sources" button** on campaigns page for easy access
+- 🔄 **Auto-redirect** from home page after source ingestion
+- 🏠 **Quick return** to home page to add more sources
+- 🌊 **Seamless workflow**: Ingest → View → Generate → Manage
+
+**Data Safety**
+- ⚠️ **Warning Dialog**: Shows task count when deleting sources with tasks
+- 🔒 **Cascade Behavior**: Tasks preserved with `sourceId` set to null (onDelete: SetNull)
+- 💾 **No Data Loss**: Tasks remain linked to campaigns and metrics intact
+
+**User Benefits**
+- ✅ Complete source lifecycle management
+- ✅ Multi-source workflow support
+- ✅ Clear visibility of source-task relationships
+- ✅ Safe deletion with clear warnings
+
+**API Endpoints**
+- `GET /api/source` - List all sources with task counts
+- `DELETE /api/source/:id` - Delete source with cascade handling
 
 </details>
 
@@ -443,13 +480,14 @@ marketer/
 - [x] **v0.5.0** — Smooth Drag-and-Drop Animations
 - [x] **v0.6.0** — Performance Dashboard & Analytics
 - [x] **v0.7.0** — Unified Campaign Manager
+- [x] **v0.7.1** — Source Management
 
 ### 📅 Planned
 
-- [ ] **v0.7.x** — Source Management & Workflow Improvements
-  - Dedicated source management page
+- [ ] **v0.7.x** — Continued Workflow Improvements
   - Empty states and onboarding hints
   - Manual metric recording UI
+  - Enhanced campaign management
 
 - [ ] **v0.8.0** — Data Management
   - Prisma migrations setup
