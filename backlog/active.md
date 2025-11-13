@@ -1,212 +1,475 @@
-# Active Backlog
+# Active Backlog - Improvement Phase
 
-# Marketing Automation MLP – Build Spec (for Claude Code)
-
-## 1. Overview
-
-**Product:** Navam Marketer (MLP edition)  
-**Audience / ICP:** Bootstrapped startup founders who need to quickly turn existing content (website, blog, or product page) into social promotions (LinkedIn posts, tweets, short blogs) without hiring a marketing team.
-
-**Goal:**  
-Automate content → promo generation → scheduling → simple analytics, using Claude (via Bedrock/Anthropic) + minimal full-stack code.
+**Product:** Navam Marketer
+**Current Version:** v0.6.0
+**Phase:** Improvement & Refinement (Post-MLP)
+**Last Updated:** 2025-11-13
 
 ---
 
-## 2. Core Principles
+## Overview
 
-- **MLP, not MVP**: deliver *delight* with minimal code — it must be usable and visually pleasing.  
-- **Human in Loop**: each feature slice can be reviewed or edited by the founder before publishing.  
-- **Single repo**: Next.js 15 (App Router) + Tailwind + Prisma.  
-- **Claude-ready**: every feature exposed through API route for LLM orchestration.  
-- **Local-first**: runs with SQLite and serverless deploy later (Vercel + Neon).
+The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature slices have been implemented with excellent test coverage (75 tests, 100% pass rate).
 
----
+**Original Slices Completed:**
+- ✅ Slice 1: Source Ingestion (v0.1.0)
+- ✅ Slice 2: Campaign & Task Management (v0.2.0)
+- ✅ Slice 3: Content Generation (v0.3.0)
+- ✅ Slice 4: Scheduling & Auto-Posting (v0.4.0)
+- ✅ Slice 5: Performance Dashboard (v0.6.0)
 
-## 3. Feature Slices
+**Achievement Highlights:**
+- 🚀 5 releases in rapid iteration
+- 🧪 75 integration tests, 100% pass rate, <1s execution
+- 📦 Full tech stack: Next.js 15, Prisma, Claude AI, dnd-kit, Recharts
+- 📚 Comprehensive documentation and release notes
 
-### Slice 1 – Source Ingestion ✅ COMPLETED (v0.1.0)
-**User story:** As a founder, I can paste a URL (product/blog) or text snippet and see a cleaned, readable summary of it.
-
-**Status:** Implemented and tested
-**Release:** v0.1.0
-**Details:** See `backlog/release-0.1.0.md`
-
-**Features** ✅
-- URL input + fetch button.
-- Readability extraction (JS-based).
-- Display cleaned markdown + save to DB.
-
-**Stack**
-- Frontend: `shadcn/ui` input + preview pane.
-- Backend: Next.js route `/api/source/fetch` using `@mozilla/readability` + `jsdom`.
-- DB: `Source` table in Prisma.
-- Eval checkpoint: extracted summary relevance & formatting.
+**Archive Note:** The original slice-based planning document has been preserved in `backlog/archive/active-slices-v0.1-v0.6.md` for historical reference.
 
 ---
 
-### Slice 2 – Campaign & Task Management (Kanban) ✅ COMPLETED (v0.2.0)
-**User story:** As a founder, I can create a campaign and view my generated tasks on a drag-drop Kanban board.
+## Current Focus: Improvement Phase
 
-**Status:** Implemented and tested
-**Release:** v0.2.0
-**Details:** See `backlog/release-0.2.0.md`
+Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs/tests-coverage.md`), we're now focusing on:
 
-**Features** ✅
-- CRUD for campaigns.
-- Kanban board with columns: *Todo*, *Draft*, *Scheduled*, *Posted*.
-- Drag & drop tasks between columns.
-- Inline edit of post text.
+1. **UX & Navigation Improvements** - Fix architectural divergence, improve workflow clarity
+2. **UI Completeness** - Add UI for existing API features
+3. **Data Management** - Better persistence and migration strategy
+4. **Real Outcome Delivery** - Actual social media posting (vs. mocking)
+5. **Testing & Quality** - Expand test coverage beyond integration tests
 
-**Stack**
-- Frontend: `dnd-kit`, `shadcn/ui`, Zustand for UI state.
-- Backend: `/api/tasks/*` routes with Prisma `Task` model.
-- Eval checkpoint: drag/drop smoothness, state persistence.
+**Planning Reference:** See `backlog/improvements-v0.7-planning.md` for detailed analysis and prioritization framework.
 
 ---
 
-### Slice 3 – Content Generation (Claude Agent) ✅ COMPLETED (v0.3.0)
-**User story:** As a founder, I can select a source and auto-generate social posts for multiple platforms.
+## Active Improvements
 
-**Status:** Implemented and tested
-**Release:** v0.3.0
-**Details:** See `backlog/release-0.3.0.md`
+### 🚧 v0.7.0 - UX & Navigation Improvements (IN PLANNING)
 
-**Features** ✅
-- "Generate from Source" modal (choose platforms, tone, CTA).
-- Call Claude (Anthropic SDK) to produce structured JSON output.
-- Save drafts to `Task.outputJson`.
-- Multi-platform generation (LinkedIn, Twitter, Blog).
-- Human-in-the-loop review workflow.
+**Theme:** Unified workflow and better navigation
 
-**Stack**
-- Backend: `/api/generate` route with Claude 3.5 Sonnet.
-- LLM: Claude Sonnet via Anthropic SDK (`@anthropic-ai/sdk`).
-- Frontend: `GenerateContentDialog` with platform selection and tone customization.
-- Eval checkpoint: quality of generated JSON and tone ✅ Excellent.
+**Priority Items:**
 
----
+#### 🔴 P0-1: Merge Dashboard into Campaigns Page
+**Status:** Planned
+**Problem:** Dashboard and campaigns are separate, breaking the dual-purpose vision of a unified campaign manager
+**Goal:** Single page for planning, scheduling, AND monitoring
 
-### Slice 4 – Scheduling & Mock Posting ✅ COMPLETED (v0.4.0)
-**User story:** As a founder, I can schedule posts for later and see them move automatically to "Posted".
+**Implementation Plan:**
+- Add "Overview" and "Tasks" tabs/sections to campaigns page
+- Filter dashboard metrics by selected campaign
+- Show KPIs + engagement chart in Overview tab
+- Show Kanban board in Tasks tab
+- Remove separate `/dashboard` route
 
-**Status:** Implemented and tested
-**Release:** v0.4.0
-**Details:** See `backlog/release-0.4.0.md`
+**Files to Modify:**
+- `app/campaigns/page.tsx` - Add tabbed interface
+- `components/dashboard-stats.tsx` - Accept optional campaignId filter
+- `components/engagement-chart.tsx` - Accept optional campaignId filter
+- `app/dashboard/page.tsx` - Redirect to /campaigns
 
-**Features** ✅
-- Date/time picker on Kanban card.
-- Simple cron loop (in-process timer).
-- Auto-update status → "Posted".
-- Mock "share" log.
-- Background scheduler service.
-- Scheduler API endpoints.
+**API Changes:**
+- Enhance `GET /api/metrics` and `GET /api/metrics/stats` with campaignId filtering (already supported)
 
-**Stack**
-- Frontend: native date/time inputs, schedule dialog (`shadcn/ui`).
-- Backend: Node interval job via `instrumentation.ts`.
-- API: `/api/scheduler/process` for manual and automated processing.
-- Eval checkpoint: accurate state transitions ✅ Excellent (60 tests pass).
+**Tests:**
+- Update integration tests for filtered metrics
+- Add component tests for tabbed interface
+
+**Estimated Effort:** 4-6 hours
+**Expected Release:** v0.7.0
 
 ---
 
-### Slice 5 – Performance Dashboard ✅ COMPLETED (v0.6.0)
-**User story:** As a founder, I can see engagement metrics at a glance.
+#### 🔴 P0-2: Add Source Management Page
+**Status:** Planned
+**Problem:** No way to navigate back to sources, can't manage multiple sources effectively
+**Goal:** Dedicated page for viewing, managing, and generating from sources
 
-**Status:** Implemented and tested
-**Release:** v0.6.0
-**Details:** See `backlog/release-0.6.0.md`
+**Implementation Plan:**
+- Create `/sources` page listing all ingested sources
+- Show source cards: title, URL, created date, task count
+- Add "Generate from Source" action on each card
+- Add "Delete Source" with confirmation dialog
+- Add navigation link: "Manage Sources"
+- Redirect from home page after fetch to `/sources`
 
-**Features** ✅
-- Mini-KPI cards: total posts, clicks, likes, shares.
-- Recharts graph: engagement over time.
-- Links served through `/r/:id` route to record metrics before redirect.
-- Dashboard page with beautiful visualizations.
-- Metrics API with aggregation endpoints.
-- Link click tracking with redirect tracker.
+**Files to Create:**
+- `app/sources/page.tsx` - Source management page
+- `components/source-card.tsx` - Individual source display card
 
-**Stack**
-- Frontend: Recharts, Tailwind grid, responsive design.
-- Backend: `/api/metrics` routes + redirect tracker + stats endpoint.
-- DB: `Metrics` model in Prisma (already existed).
-- Eval checkpoint: data correctness and visual clarity ✅ Excellent (75 tests pass).
+**Files to Modify:**
+- `app/page.tsx` - Redirect to /sources after successful fetch
+- Add navigation link to sources in page headers
 
----
+**API Changes:**
+- Add `DELETE /api/source/[id]` endpoint
+- Existing `GET /api/source` already lists all sources
 
-### Slice 6 – Auth (Optional)
-**User story:** As a founder, I can log in with email or GitHub.
+**Tests:**
+- Integration tests for source deletion
+- Integration tests for cascade behavior (tasks remain, sourceId nulled)
+- Component tests for source cards
 
-**Features**
-- Passwordless email or OAuth.
-- Session per user.
-
-**Stack**
-- `Auth.js` (NextAuth) + Prisma adapter.
-- Eval checkpoint: basic secure login flow.
-
----
-
-## 4. Tech Stack Summary
-
-| Layer | Library / Tool | Status | Purpose |
-|-------|----------------|--------|----------|
-| **Frontend** | Next.js 15 (App Router) | ✅ v0.1.0 | UI + API routes |
-|  | Tailwind CSS + shadcn/ui + Radix | ✅ v0.1.0 | Design system |
-|  | dnd-kit | ✅ v0.2.0 | Drag-drop Kanban |
-|  | Zustand | ✅ v0.2.0 | Local UI state |
-|  | Recharts | ✅ v0.6.0 | Charts and KPIs |
-|  | TanStack Query | 📋 Planned | Server state caching (future optimization) |
-| **Backend** | Prisma + SQLite (dev) | ✅ v0.1.0 | Persistence (Postgres for prod) |
-|  | Next.js API Routes | ✅ v0.1.0 | Business logic |
-|  | Node setInterval (instrumentation.ts) | ✅ v0.4.0 | Background scheduling |
-| **AI/Agents** | Anthropic SDK (Claude Sonnet 4.5) | ✅ v0.3.0 | Content generation |
-|  | LangGraph (JS) | 📋 Planned | Agent orchestration (future) |
-| **Content Extraction** | jsdom + @mozilla/readability | ✅ v0.1.0 | HTML → markdown |
-| **Auth** | NextAuth | 📋 Planned | Optional (Slice 6) |
-| **Infra** | Localhost / Vercel | ✅ v0.1.0 | Development + deployment ready |
-
-**Legend:** ✅ Implemented | 📋 Planned | ❌ Not used
+**Estimated Effort:** 3-4 hours
+**Expected Release:** v0.7.0
 
 ---
 
-## 5. Development Workflow (Human-in-Loop)
+#### 🟡 P1-3: Improve Campaign Workflow Clarity
+**Status:** Planned
+**Problem:** Workflow not obvious: source ingestion → campaign creation → task generation
+**Goal:** Guided experience with contextual prompts and empty states
 
-1. **Pick one slice** below.  
-2. Claude builds the implementation incrementally (UI + API + schema).  
-3. You run locally (`pnpm dev`), evaluate UX + correctness.  
-4. Approve or revise → move to next slice.
+**Implementation Plan:**
+- Add empty state messages with next step guidance
+  - No sources: "Get started by adding a content source"
+  - No campaigns: "Create your first campaign to organize tasks"
+  - No tasks: "Generate content from a source or create manually"
+- Add breadcrumb navigation component
+- Add campaign description field to show which source was used
+- Add onboarding hints (can be dismissed)
 
-**Recommended Order**
-1. Slice 1 – Source Ingestion  
-2. Slice 2 – Kanban Tasks  
-3. Slice 3 – Claude Generation  
-4. Slice 4 – Scheduling  
-5. Slice 5 – Dashboard  
-6. Slice 6 – Auth (optional)
+**Files to Create:**
+- `components/empty-state.tsx` - Reusable empty state component
+- `components/breadcrumbs.tsx` - Navigation breadcrumbs
 
----
+**Files to Modify:**
+- `app/campaigns/page.tsx` - Add empty states
+- `app/sources/page.tsx` - Add empty states
+- Schema: Add `Campaign.sourceId` optional relation
 
-## 6. Example Claude Command Prompts
+**Tests:**
+- Component tests for empty states
+- Integration tests for campaign-source relationship
 
-### Build a Slice
-> Implement *Slice 1 – Source Ingestion* from the MLP Spec.  
-> Include both frontend and backend code in Next.js 15 with Prisma models.  
-> Use shadcn/ui and Tailwind for styling.  
-> Output runnable code and brief usage steps.
-
-### Evaluate a Slice
-> Review output from previous slice, run it locally, and suggest UX/code improvements.
-
----
-
-## 7. Deliverables
-
-Each slice must include:
-- Updated Prisma schema (if needed)
-- Next.js route(s)
-- UI components (page, modal, or board)
-- Example data (seed)
-- Test command to verify flow locally
+**Estimated Effort:** 2-3 hours
+**Expected Release:** v0.7.0
 
 ---
 
-**End of Spec**
+**Total v0.7.0 Effort:** ~9-13 hours
+**Release Criteria:**
+- All 3 improvements implemented
+- Tests passing (target: 80+ tests)
+- Documentation updated (README, release notes)
+- Manual testing of new navigation flow
+
+---
+
+## Backlog - Future Improvements
+
+### v0.7.x - UI Completeness (Patches)
+
+#### 🟡 P1-4: Manual Metric Recording UI
+**Status:** Backlog
+**Problem:** Can only record clicks automatically, no UI for likes/shares
+**Goal:** Manual metric entry for engagement tracking
+
+**Features:**
+- "Record Metrics" button on posted task cards
+- Dialog with metric type (like, share, comment) and value input
+- Quick actions: "+1 Like", "+1 Share" buttons
+- Show current metrics as badges on cards
+
+**API:** Already exists (POST /api/metrics)
+**Estimated Effort:** 2-3 hours
+**Expected Release:** v0.7.1
+
+---
+
+#### 🟢 P2-5: Enhanced Campaign Management
+**Status:** Backlog
+**Problem:** Limited campaign management features
+**Goal:** Better campaign organization and lifecycle management
+
+**Features:**
+- Campaign search/filter in dropdown
+- Campaign statistics in dropdown (task count, posted count)
+- Archive campaign (soft delete with archived flag)
+- Restore archived campaigns
+- Duplicate campaign with tasks
+
+**Schema Changes:**
+- Add `Campaign.archived: Boolean` (default false)
+- Add `Campaign.archivedAt: DateTime?`
+
+**Estimated Effort:** 3-4 hours
+**Expected Release:** v0.7.2
+
+---
+
+### v0.8.0 - Data Management (Minor Release)
+
+#### 🟡 P1-6: Prisma Migrations Setup
+**Status:** Backlog
+**Problem:** Using `db:push` for development, no migration history
+**Goal:** Production-ready migration workflow
+
+**Features:**
+- Initialize Prisma migrations with full history
+- Migration files for all schema changes
+- Update README with migration instructions
+- Production deployment guide
+
+**Tasks:**
+- Run `npx prisma migrate dev --name init`
+- Update package.json scripts
+- Document migration workflow
+
+**Estimated Effort:** 2-3 hours
+**Expected Release:** v0.8.0
+
+---
+
+#### 🟢 P2-7: Data Export/Import
+**Status:** Backlog
+**Problem:** No way to backup or transfer campaigns
+**Goal:** Export/import campaigns with all related data
+
+**Features:**
+- Export campaign as JSON (includes tasks and metrics)
+- Import campaign from JSON file
+- Validation and error handling
+- Duplicate detection
+
+**API:**
+- `GET /api/campaigns/[id]/export`
+- `POST /api/campaigns/import`
+
+**Estimated Effort:** 4-5 hours
+**Expected Release:** v0.8.1
+
+---
+
+### v0.9.0 - Real Outcome Delivery (Minor Release)
+
+#### 🟡 P1-8: LinkedIn API Integration
+**Status:** Backlog
+**Problem:** "Posted" status is mock, not actually posting to LinkedIn
+**Goal:** Real LinkedIn publishing via API
+
+**Features:**
+- LinkedIn OAuth flow for authentication
+- Store access tokens securely
+- POST to LinkedIn API when task is scheduled
+- Handle API errors and rate limits
+- Store published post URL
+- Show actual LinkedIn link on task card
+
+**Dependencies:**
+- User authentication (Slice 6 or simple token storage)
+- LinkedIn Developer App credentials
+
+**Schema Changes:**
+- Add `User` table (if not exists)
+- Add `User.linkedinAccessToken: String?`
+- Add `Task.publishedUrl: String?`
+- Add `Task.publishError: String?`
+
+**Estimated Effort:** 8-10 hours
+**Expected Release:** v0.9.0
+
+---
+
+#### 🟢 P2-9: Twitter/X API Integration
+**Status:** Backlog
+**Problem:** No actual posting to Twitter/X
+**Goal:** Real Twitter publishing via API v2
+
+**Features:**
+- Twitter OAuth 2.0 flow
+- POST to Twitter API
+- Handle character limits and media
+- Thread support for longer content
+- Store tweet URL
+
+**Similar to LinkedIn integration but with Twitter API**
+
+**Estimated Effort:** 6-8 hours
+**Expected Release:** v0.9.1
+
+---
+
+### v1.0.0 - Agentic System (Major Release)
+
+#### 🟡 P1-10: LangGraph Agent Orchestration
+**Status:** Backlog
+**Problem:** Direct Anthropic API calls, no intelligent routing
+**Goal:** LangGraph workflow with model routing (Haiku for speed, Sonnet for reasoning)
+
+**Features:**
+- Install LangGraph JS
+- Create agent graph with nodes: analyze → route → generate → review
+- Route simple tasks to Haiku 4.5 (faster, cheaper)
+- Route complex tasks to Sonnet 4.5 (better reasoning)
+- Human-in-loop checkpoints
+- Stream progress updates to UI
+- Agent decision logging
+
+**Files to Create:**
+- `lib/agents/content-generator.ts` - Main LangGraph agent
+- `lib/agents/nodes/analyze.ts` - Content analysis node
+- `lib/agents/nodes/generate.ts` - Generation node
+- `lib/agents/nodes/review.ts` - Quality review node
+
+**Dependencies:**
+- `@langchain/langgraph` package
+
+**Estimated Effort:** 15-20 hours (major refactor)
+**Expected Release:** v1.0.0
+
+---
+
+## Testing & Quality Improvements (Ongoing)
+
+### 🟢 P2-11: Component Tests for Complex UI
+**Status:** Backlog
+**Goal:** Test Kanban and Dashboard components with React Testing Library
+
+**Scope:**
+- Kanban board drag-and-drop interactions
+- Dashboard chart rendering and data
+- Dialog open/close and form submissions
+- Mock API calls with MSW (Mock Service Worker)
+
+**Target:** +15-20 tests
+**Expected Release:** Patch releases (0.7.3, 0.8.2, etc.)
+
+---
+
+### 🟢 P2-12: Accessibility Tests
+**Status:** Backlog
+**Goal:** Ensure app is accessible (a11y compliance)
+
+**Scope:**
+- Install jest-axe
+- Add a11y tests for all components
+- Add ARIA labels where missing
+- Test keyboard navigation
+- Color contrast validation
+
+**Target:** +10-15 tests
+**Expected Release:** Patch releases
+
+---
+
+### ⚪ P3-13: E2E Tests with Playwright
+**Status:** Future (blocked)
+**Goal:** Full browser automation for critical workflows
+
+**Blockers:**
+- Previous Playwright attempts failed with modal form inputs
+- Need better selectors and wait strategies
+
+**Scope:**
+- Full workflow: source → campaign → generate → schedule → metrics
+- Drag-and-drop in real browser
+- Form submissions and validations
+
+**Target:** +10-15 E2E tests
+**Expected Release:** v1.1.0+
+
+---
+
+### ⚪ P3-14: Performance Tests
+**Status:** Future
+**Goal:** Test with large datasets (500+ tasks)
+
+**Scope:**
+- Seed test database with large datasets
+- Measure Kanban render performance
+- Measure API response times
+- Optimize with database indexes
+- Add pagination if needed
+
+**Expected Release:** v1.1.0+
+
+---
+
+## Development Workflow
+
+**For Each Improvement:**
+
+1. **Planning**
+   - Review item from backlog
+   - Confirm scope and approach
+   - Update item status to "In Progress"
+
+2. **Implementation**
+   - Create/modify files as specified
+   - Follow existing patterns and conventions
+   - Update schema if needed (run db:push)
+
+3. **Testing**
+   - Write integration tests for API changes
+   - Write component tests for UI changes
+   - Run all tests: `npm test`
+   - Fix any regressions
+
+4. **Documentation**
+   - Create release notes in `backlog/release-X.Y.Z.md`
+   - Update README.md if user-facing changes
+   - Update this file to mark item complete
+
+5. **Version & Release**
+   - Update package.json version
+   - Commit with descriptive message
+   - Push to remote
+   - Update backlog item status to "Complete"
+
+---
+
+## Versioning Strategy
+
+**Semantic Versioning (semver):**
+- **Major (X.0.0):** Breaking changes, major refactors (e.g., LangGraph)
+- **Minor (0.X.0):** New features, significant improvements (e.g., LinkedIn integration)
+- **Patch (0.0.X):** Bug fixes, UI completeness, small enhancements
+
+**Current:** v0.6.0
+**Next:** v0.7.0 (UX improvements - minor bump)
+
+---
+
+## Success Metrics
+
+**How we measure improvement success:**
+
+1. **User Experience**
+   - ✅ Can complete full workflow without confusion
+   - ✅ Empty states guide next actions
+   - ✅ Navigation is intuitive and clear
+
+2. **Feature Completeness**
+   - ✅ All API features have UI implementations
+   - ✅ No mocked features (real posting works)
+   - ✅ Data can be managed (export, import, backup)
+
+3. **Code Quality**
+   - ✅ Test coverage stays ≥75 tests, 100% pass rate
+   - ✅ Build time stays fast (<5 seconds)
+   - ✅ No console errors or warnings
+
+4. **Documentation**
+   - ✅ README reflects current features accurately
+   - ✅ Every release has detailed notes
+   - ✅ Code has inline comments for complex logic
+
+---
+
+## Notes
+
+- **MLP Philosophy:** Delight with minimal code - maintained throughout improvements
+- **Human-in-Loop:** Always review before publish - no change to this principle
+- **Incremental Releases:** Small, frequent improvements - better than big rewrites
+- **Test-Driven:** No new feature without tests - quality over speed
+- **User Feedback:** Continuously incorporate feedback from `backlog/feedback.md`
+
+**Planning Reference:** `backlog/improvements-v0.7-planning.md` contains detailed analysis, prioritization framework, and decision rationale.
+
+**Archive:** Original slice-based planning: `backlog/archive/active-slices-v0.1-v0.6.md`
+
+---
+
+**Last Updated:** 2025-11-13
+**Status:** Ready for v0.7.0 development
