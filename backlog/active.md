@@ -155,8 +155,8 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ### v0.7.x - UI Completeness (Patches)
 
-#### 🟡 P1-4: Manual Metric Recording UI
-**Status:** Backlog
+#### ✅ P1-4: Manual Metric Recording UI
+**Status:** Completed (v0.7.3)
 **Problem:** Can only record clicks automatically, no UI for likes/shares
 **Goal:** Manual metric entry for engagement tracking
 

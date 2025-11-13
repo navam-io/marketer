@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, Check, X, Calendar } from 'lucide-react';
+import { Pencil, Trash2, Check, X, Calendar, BarChart3, Heart, Share2, MessageCircle, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScheduleTaskDialog } from '@/components/schedule-task-dialog';
+import { RecordMetricsDialog } from '@/components/record-metrics-dialog';
 
 interface Task {
   id: string;
@@ -23,6 +24,12 @@ interface Task {
   postedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface Metric {
+  id: string;
+  type: string;
+  value: number;
 }
 
 interface KanbanCardProps {
@@ -43,6 +50,8 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(task.content || '');
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const [isRecordMetricsOpen, setIsRecordMetricsOpen] = useState(false);
+  const [metrics, setMetrics] = useState<Metric[]>([]);
 
   const {
     attributes,
@@ -87,6 +96,61 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
     await onUpdate(taskId, updates);
   };
 
+  // Fetch metrics for posted tasks
+  useEffect(() => {
+    if (task.status === 'posted') {
+      fetchMetrics();
+    }
+  }, [task.id, task.status]);
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch(`/api/metrics?taskId=${task.id}`);
+      if (!response.ok) return;
+      const data = await response.json();
+
+      // Aggregate metrics by type
+      const aggregated = data.metrics.reduce((acc: Record<string, number>, metric: Metric) => {
+        acc[metric.type] = (acc[metric.type] || 0) + metric.value;
+        return acc;
+      }, {});
+
+      const metricsArray = Object.entries(aggregated).map(([type, value]) => ({
+        id: type,
+        type,
+        value: value as number
+      }));
+
+      setMetrics(metricsArray);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
+  };
+
+  const handleMetricRecorded = () => {
+    fetchMetrics(); // Refresh metrics after recording
+  };
+
+  const getMetricIcon = (type: string) => {
+    switch (type) {
+      case 'like': return <Heart className="h-3 w-3" />;
+      case 'share': return <Share2 className="h-3 w-3" />;
+      case 'comment': return <MessageCircle className="h-3 w-3" />;
+      case 'click': return <TrendingUp className="h-3 w-3" />;
+      default: return <BarChart3 className="h-3 w-3" />;
+    }
+  };
+
+  const getMetricColor = (type: string) => {
+    switch (type) {
+      case 'like': return 'bg-pink-100 text-pink-700 border-pink-200';
+      case 'share': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'comment': return 'bg-green-100 text-green-700 border-green-200';
+      case 'click': return 'bg-purple-100 text-purple-700 border-purple-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
   const platformColor = task.platform
     ? PLATFORM_COLORS[task.platform] || PLATFORM_COLORS.default
     : PLATFORM_COLORS.default;
@@ -115,6 +179,20 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
             <div className="flex gap-1">
               {!isEditing && (
                 <>
+                  {task.status === 'posted' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsRecordMetricsOpen(true);
+                      }}
+                      title="Record metrics"
+                    >
+                      <BarChart3 className="h-3 w-3" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -200,6 +278,20 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
                   {new Date(task.scheduledAt).toLocaleDateString()}
                 </div>
               )}
+              {task.status === 'posted' && metrics.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {metrics.map((metric) => (
+                    <Badge
+                      key={metric.id}
+                      variant="outline"
+                      className={cn("text-xs flex items-center gap-1", getMetricColor(metric.type))}
+                    >
+                      {getMetricIcon(metric.type)}
+                      {metric.value}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -211,6 +303,13 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
         taskId={task.id}
         currentScheduledAt={task.scheduledAt}
         onSchedule={handleSchedule}
+      />
+
+      <RecordMetricsDialog
+        open={isRecordMetricsOpen}
+        onOpenChange={setIsRecordMetricsOpen}
+        taskId={task.id}
+        onMetricRecorded={handleMetricRecorded}
       />
     </div>
   );

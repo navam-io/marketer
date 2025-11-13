@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.7.1-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.7.3-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -157,6 +157,14 @@ Track your social media engagement with real-time metrics and beautiful visualiz
 - `GET /api/metrics` - Retrieve metrics with filtering
 - `POST /api/metrics` - Create new metrics
 - `GET /api/metrics/stats` - Aggregated statistics
+
+**Manual Metric Recording** <code>v0.7.3</code>
+- 📊 **Record Metrics Dialog**: Click-to-open interface on posted tasks
+- ⚡ **Quick Actions**: One-click +1 buttons for likes, shares, comments, clicks
+- 📝 **Custom Entry**: Form for bulk metric recording
+- 🎨 **Visual Display**: Color-coded badges with icons on kanban cards
+- 🔄 **Real-Time Updates**: Metrics refresh automatically after recording
+- 🎯 **Smart Aggregation**: Automatic summing of metrics by type
 
 </details>
 
