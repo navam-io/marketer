@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ExternalLink, Sparkles, Trash2, FileText } from 'lucide-react';
+import { ExternalLink, Sparkles, Trash2, FileText, Eye } from 'lucide-react';
 
 interface Source {
   id: string;
@@ -28,9 +28,10 @@ interface SourceCardProps {
   source: Source;
   onDelete: (id: string) => void;
   onGenerate: (source: Source) => void;
+  onViewDetails: (source: Source) => void;
 }
 
-export function SourceCard({ source, onDelete, onGenerate }: SourceCardProps) {
+export function SourceCard({ source, onDelete, onGenerate, onViewDetails }: SourceCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -111,9 +112,18 @@ export function SourceCard({ source, onDelete, onGenerate }: SourceCardProps) {
               Generate from Source
             </Button>
             <Button
+              onClick={() => onViewDetails(source)}
+              variant="outline"
+              size="icon"
+              title="View details"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
               onClick={() => setIsDeleteDialogOpen(true)}
               variant="outline"
               size="icon"
+              title="Delete source"
             >
               <Trash2 className="h-4 w-4 text-red-600" />
             </Button>

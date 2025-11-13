@@ -59,20 +59,31 @@
 
 ---
 
+[x] **Issue #3 - Improve Source Fetch UX** (Resolved in v0.10.0)
+
+**Problem:** When source is added using Sources Ingestion, it shows the source content for a second then moves to Sources view. This is janky behavior as user is not able to parse the detailed source scraped content before the view changes.
+
+**Solution:** Implemented toast notification system and source details viewer:
+- Added Sonner toast library for elegant notifications
+- Dialog closes immediately with "Processing source..." loading toast
+- Success toast shown when source is added
+- Error toast shown on failure with dialog reopening for retry
+- New "View Details" button (eye icon) on each source card
+- SourceDetailsDialog modal shows full content, excerpt, URL, and metadata
+- Users can now review source content anytime after ingestion
+
+**Implementation:**
+- Created `components/ui/sonner.tsx` wrapper for toast system
+- Created `components/source-details-dialog.tsx` for viewing full source content
+- Updated `components/add-source-dialog.tsx` to use toast notifications
+- Updated `components/source-card.tsx` to add view details button
+- Updated `app/sources/page.tsx` to integrate details dialog
+- Added comprehensive test coverage (35 tests total)
+
+**See:** `backlog/release-0.10.0.md` for details
+
+---
+
 ## Active
 
-[ ] **Issue #3 - Improve Source Fetch UX**
-
-When source is added using Sources Ingestion, it shows the source content for a second then moves to Sources view. This is janky behavior as user is not able to parse the detailed source scraped content before the view changes.
-
-**Desired Behavior:**
-1. Show source ingestion modal
-2. User enters url and clicks fetch
-3. Ease out modal and show notification on sources view that processing source
-4. Show notification done processing
-5. Show new source card
-6. Add icon on source card to view source details
-7. Show modal to show source details
-
-**Priority:** Medium
-**Estimated Effort:** 3-4 hours
+No active issues at this time.

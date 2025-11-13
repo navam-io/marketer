@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SourceCard } from '@/components/source-card';
 import { AddSourceDialog } from '@/components/add-source-dialog';
+import { SourceDetailsDialog } from '@/components/source-details-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { CampaignSelectorDialog } from '@/components/campaign-selector-dialog';
 import { useAppStore } from '@/lib/store';
@@ -37,6 +38,8 @@ export default function SourcesPage() {
   const [isCampaignSelectorOpen, setIsCampaignSelectorOpen] = useState(false);
   const [selectedSourceForGeneration, setSelectedSourceForGeneration] = useState<Source | null>(null);
   const [isCreatingCampaign, setIsCreatingCampaign] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [selectedSourceForDetails, setSelectedSourceForDetails] = useState<Source | null>(null);
   const { isGenerateContentOpen, setIsGenerateContentOpen, selectedCampaignId, setSelectedCampaignId } = useAppStore();
 
   const fetchSources = useCallback(async () => {
@@ -171,6 +174,11 @@ export default function SourcesPage() {
     fetchSources();
   };
 
+  const handleViewDetails = (source: Source) => {
+    setSelectedSourceForDetails(source);
+    setIsDetailsDialogOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8">
@@ -238,6 +246,7 @@ export default function SourcesPage() {
             source={source}
             onDelete={handleDelete}
             onGenerate={handleGenerate}
+            onViewDetails={handleViewDetails}
           />
         ))}
       </div>
@@ -255,6 +264,12 @@ export default function SourcesPage() {
         sourceName={selectedSourceForGeneration?.title || 'Untitled Source'}
         onSelect={handleCampaignSelected}
         isCreatingCampaign={isCreatingCampaign}
+      />
+
+      <SourceDetailsDialog
+        source={selectedSourceForDetails}
+        open={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
       />
 
       {selectedCampaignId && (

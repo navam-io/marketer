@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,10 @@ export function AddSourceDialog({ open, onOpenChange, onSourceAdded }: AddSource
     setLoading(true);
     setError('');
 
+    // Close dialog immediately and show processing notification
+    onOpenChange(false);
+    toast.loading('Processing source...', { id: 'fetch-source' });
+
     try {
       const response = await fetch('/api/source/fetch', {
         method: 'POST',
@@ -60,15 +65,21 @@ export function AddSourceDialog({ open, onOpenChange, onSourceAdded }: AddSource
         throw new Error(data.error || 'Failed to fetch content');
       }
 
-      // Reset form and close dialog
+      // Show success notification
+      toast.success('Source added successfully!', { id: 'fetch-source' });
+
+      // Reset form
       setUrl('');
       setError('');
-      onOpenChange(false);
 
       // Notify parent to refresh sources list
       onSourceAdded();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      toast.error(errorMessage, { id: 'fetch-source' });
+      setError(errorMessage);
+      // Reopen dialog on error so user can retry
+      onOpenChange(true);
     } finally {
       setLoading(false);
     }

@@ -13,9 +13,19 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AddSourceDialog } from '@/components/add-source-dialog';
+import { toast } from 'sonner';
 
 // Mock fetch globally
 global.fetch = jest.fn();
+
+// Mock sonner toast
+jest.mock('sonner', () => ({
+  toast: {
+    loading: jest.fn(),
+    success: jest.fn(),
+    error: jest.fn(),
+  },
+}));
 
 describe('AddSourceDialog', () => {
   const mockOnOpenChange = jest.fn();
@@ -24,6 +34,9 @@ describe('AddSourceDialog', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockClear();
+    (toast.loading as jest.Mock).mockClear();
+    (toast.success as jest.Mock).mockClear();
+    (toast.error as jest.Mock).mockClear();
   });
 
   describe('Dialog Rendering', () => {
@@ -197,7 +210,7 @@ describe('AddSourceDialog', () => {
       });
     });
 
-    it('should close dialog on successful submission', async () => {
+    it('should close dialog and show loading toast on submission', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -228,10 +241,11 @@ describe('AddSourceDialog', () => {
 
       await waitFor(() => {
         expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+        expect(toast.loading).toHaveBeenCalledWith('Processing source...', { id: 'fetch-source' });
       });
     });
 
-    it('should call onSourceAdded callback on success', async () => {
+    it('should show success toast and call onSourceAdded on success', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -261,6 +275,7 @@ describe('AddSourceDialog', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Source added successfully!', { id: 'fetch-source' });
         expect(mockOnSourceAdded).toHaveBeenCalled();
       });
     });
@@ -304,7 +319,7 @@ describe('AddSourceDialog', () => {
   });
 
   describe('API Integration - Error', () => {
-    it('should show error message when API returns error', async () => {
+    it('should show error toast and reopen dialog when API returns error', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         json: async () => ({
@@ -326,15 +341,21 @@ describe('AddSourceDialog', () => {
       fireEvent.change(input, { target: { value: 'https://invalid-url.com' } });
       fireEvent.click(submitButton);
 
+      // Dialog closes initially
       await waitFor(() => {
-        expect(screen.getByText('Failed to fetch content from URL')).toBeInTheDocument();
+        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
       });
 
-      expect(mockOnOpenChange).not.toHaveBeenCalledWith(false);
+      // Then error toast is shown and dialog reopens
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Failed to fetch content from URL', { id: 'fetch-source' });
+        expect(mockOnOpenChange).toHaveBeenCalledWith(true);
+      });
+
       expect(mockOnSourceAdded).not.toHaveBeenCalled();
     });
 
-    it('should show generic error when API throws', async () => {
+    it('should show error toast when API throws', async () => {
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
       render(
@@ -351,46 +372,23 @@ describe('AddSourceDialog', () => {
       fireEvent.change(input, { target: { value: 'https://example.com' } });
       fireEvent.click(submitButton);
 
+      // Dialog closes initially
       await waitFor(() => {
-        expect(screen.getByText('Network error')).toBeInTheDocument();
+        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
       });
 
-      expect(mockOnOpenChange).not.toHaveBeenCalledWith(false);
+      // Then error toast is shown and dialog reopens
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Network error', { id: 'fetch-source' });
+        expect(mockOnOpenChange).toHaveBeenCalledWith(true);
+      });
+
       expect(mockOnSourceAdded).not.toHaveBeenCalled();
-    });
-
-    it('should keep dialog open after error', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'Server error' })
-      });
-
-      render(
-        <AddSourceDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          onSourceAdded={mockOnSourceAdded}
-        />
-      );
-
-      const input = screen.getByLabelText('URL');
-      const submitButton = screen.getByText('Add Source');
-
-      fireEvent.change(input, { target: { value: 'https://example.com' } });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Server error')).toBeInTheDocument();
-      });
-
-      // Dialog should still be visible
-      expect(screen.getByText('Add Content Source')).toBeInTheDocument();
-      expect(mockOnOpenChange).not.toHaveBeenCalledWith(false);
     });
   });
 
   describe('Loading States', () => {
-    it('should show loading state during submission', async () => {
+    it('should show loading toast during submission', async () => {
       (global.fetch as jest.Mock).mockImplementation(() =>
         new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({ source: {} }) }), 100))
       );
@@ -410,66 +408,15 @@ describe('AddSourceDialog', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Fetching...')).toBeInTheDocument();
+        expect(toast.loading).toHaveBeenCalledWith('Processing source...', { id: 'fetch-source' });
+        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
       });
 
       await waitFor(() => {
-        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+        expect(toast.success).toHaveBeenCalled();
       });
     });
 
-    it('should disable input during submission', async () => {
-      (global.fetch as jest.Mock).mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({ source: {} }) }), 100))
-      );
-
-      render(
-        <AddSourceDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          onSourceAdded={mockOnSourceAdded}
-        />
-      );
-
-      const input = screen.getByLabelText('URL');
-      const submitButton = screen.getByText('Add Source');
-
-      fireEvent.change(input, { target: { value: 'https://example.com' } });
-      fireEvent.click(submitButton);
-
-      expect(input).toBeDisabled();
-
-      await waitFor(() => {
-        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
-      });
-    });
-
-    it('should disable buttons during submission', async () => {
-      (global.fetch as jest.Mock).mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({ source: {} }) }), 100))
-      );
-
-      render(
-        <AddSourceDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          onSourceAdded={mockOnSourceAdded}
-        />
-      );
-
-      const input = screen.getByLabelText('URL');
-      const submitButton = screen.getByText('Add Source');
-      const cancelButton = screen.getByText('Cancel');
-
-      fireEvent.change(input, { target: { value: 'https://example.com' } });
-      fireEvent.click(submitButton);
-
-      expect(cancelButton).toBeDisabled();
-
-      await waitFor(() => {
-        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
-      });
-    });
   });
 
   describe('Dialog Interactions', () => {
@@ -509,31 +456,5 @@ describe('AddSourceDialog', () => {
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
 
-    it('should not allow closing dialog during submission', async () => {
-      (global.fetch as jest.Mock).mockImplementation(() =>
-        new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({ source: {} }) }), 100))
-      );
-
-      render(
-        <AddSourceDialog
-          open={true}
-          onOpenChange={mockOnOpenChange}
-          onSourceAdded={mockOnSourceAdded}
-        />
-      );
-
-      const input = screen.getByLabelText('URL');
-      const submitButton = screen.getByText('Add Source');
-
-      fireEvent.change(input, { target: { value: 'https://example.com' } });
-      fireEvent.click(submitButton);
-
-      const cancelButton = screen.getByText('Cancel');
-      expect(cancelButton).toBeDisabled();
-
-      await waitFor(() => {
-        expect(mockOnOpenChange).toHaveBeenCalledWith(false);
-      });
-    });
   });
 });
