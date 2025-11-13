@@ -90,17 +90,9 @@ export default function SourcesPage() {
   if (sources.length === 0) {
     return (
       <div className="container mx-auto py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Sources</h1>
-            <p className="text-slate-600 mt-1">Manage your content sources</p>
-          </div>
-          <Link href="/">
-            <Button variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Source
-            </Button>
-          </Link>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Sources</h1>
+          <p className="text-slate-600 mt-1">Manage your content sources</p>
         </div>
 
         <Card>
@@ -135,20 +127,12 @@ export default function SourcesPage() {
             Manage your content sources and generate posts
           </p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/">
-            <Button variant="outline">
-              <Home className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-          </Link>
-          <Link href="/">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Source
-            </Button>
-          </Link>
-        </div>
+        <Link href="/">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Source
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

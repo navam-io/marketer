@@ -228,12 +228,6 @@ export default function CampaignsPage() {
           <p className="text-slate-600 mt-1">Manage your marketing campaigns, tasks, and performance</p>
         </div>
         <div className="flex gap-3">
-          <Link href="/sources">
-            <Button variant="outline">
-              <FileText className="h-4 w-4 mr-2" />
-              Manage Sources
-            </Button>
-          </Link>
           <Button onClick={() => setIsCreateCampaignOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Campaign
