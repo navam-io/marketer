@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.11.0
+**Current Version:** v0.11.1
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -307,29 +307,52 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-## Active Improvements
+### ✅ v0.11.1 - Dismissible Onboarding Hints (RELEASED 2025-11-13)
 
-### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
+**Theme:** First-time user guidance with dismissible hints
 
----
-
-#### 🟢 P2-13: Dismissible Onboarding Hints
-**Status:** Backlog (Deferred from v0.11.0)
+#### ✅ P2-13: Dismissible Onboarding Hints
+**Status:** Complete (Released in v0.11.1)
+**Released:** 2025-11-13
 **Problem:** First-time users may still miss key features
 **Goal:** Subtle, dismissible hints for workflow guidance
 
-**Features:**
-- Tooltip hints on first visit to each page
-- Dismiss button with persistence (localStorage)
-- Highlight key actions (Generate, New Task, etc.)
-- Non-intrusive, progressive disclosure
+**Implementation:**
+- ✅ Created `OnboardingHint` component with default and compact variants
+- ✅ Created `lib/onboarding.ts` for localStorage persistence
+- ✅ Added hints to Sources page (sources-generate)
+- ✅ Added hints to Campaigns page (campaigns-select, kanban-drag-drop, dashboard-metrics)
+- ✅ localStorage-based dismissal tracking
+- ✅ SSR-safe implementation
+- ✅ Full error handling (corrupt data, quota exceeded, access denied)
+- ✅ Comprehensive test coverage (35 new tests)
 
-**Files to Create:**
+**Files Created:**
+- `lib/onboarding.ts` - Hint persistence logic
 - `components/onboarding-hint.tsx` - Reusable hint component
-- `lib/onboarding.ts` - Track hint dismissals
+- `__tests__/integration/onboarding-hints.test.ts` - 30 tests
+- `__tests__/components/onboarding-hint.test.tsx` - 20 tests
+- `backlog/release-0.11.1.md` - Release notes
 
-**Estimated Effort:** 2-3 hours
-**Expected Release:** v0.11.1
+**Files Modified:**
+- `app/sources/page.tsx` - Added sources-generate hint
+- `app/campaigns/page.tsx` - Added 3 contextual hints
+- `package.json` - Version bump to 0.11.1
+
+**Results:**
+- All 227 tests passing (+35 new tests)
+- No regressions
+- Contextual hints guide first-time users
+- Non-intrusive UX (dismissible, persistent)
+- 100% test coverage on new code
+
+**See:** `backlog/release-0.11.1.md` for full details
+
+---
+
+## Active Improvements
+
+### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
 
 ---
 
@@ -634,5 +657,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Current Status:** v0.10.0 released - Ready for v0.11.0 planning
-**Recent Momentum:** 10 releases in 2 weeks with 5 major issues resolved
+**Current Status:** v0.11.1 released - Ready for v0.11.2 planning
+**Recent Momentum:** 12 releases in 2 weeks with 6 major improvements completed

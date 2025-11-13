@@ -18,6 +18,7 @@ import { CreateTaskDialog } from '@/components/create-task-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
+import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
 import { Plus, Loader2, Sparkles, BarChart3, List, FileText } from 'lucide-react';
 
@@ -241,6 +242,15 @@ export default function CampaignsPage() {
         </div>
       </div>
 
+      {!selectedCampaignId && campaigns.length > 0 && (
+        <OnboardingHint
+          id="campaigns-select"
+          title="Select a Campaign"
+          description="Choose a campaign from the dropdown to view and manage its tasks. You can organize different marketing initiatives as separate campaigns."
+          variant="compact"
+        />
+      )}
+
       <div className="flex items-center gap-4">
         <div className="flex-1">
           <Select value={selectedCampaignId || ''} onValueChange={setSelectedCampaignId}>
@@ -366,17 +376,31 @@ export default function CampaignsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <KanbanBoard
-                tasks={tasks}
-                onTaskUpdate={handleTaskUpdate}
-                onTaskDelete={handleTaskDelete}
-              />
+              <>
+                <OnboardingHint
+                  id="kanban-drag-drop"
+                  title="Drag & Drop Tasks"
+                  description="Drag task cards between columns (To Do → Draft → Scheduled → Posted) to update their status. You can also reorder tasks within each column."
+                  variant="compact"
+                />
+                <KanbanBoard
+                  tasks={tasks}
+                  onTaskUpdate={handleTaskUpdate}
+                  onTaskDelete={handleTaskDelete}
+                />
+              </>
             )}
           </TabsContent>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
             {stats ? (
               <>
+                <OnboardingHint
+                  id="dashboard-metrics"
+                  title="Track Performance"
+                  description='Monitor clicks, likes, and shares for your posts. Use the "Record Metrics" button on posted task cards to manually log engagement data.'
+                  variant="compact"
+                />
                 <DashboardStats stats={stats} />
                 <Card>
                   <CardHeader>

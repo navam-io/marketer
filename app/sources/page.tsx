@@ -9,6 +9,7 @@ import { AddSourceDialog } from '@/components/add-source-dialog';
 import { SourceDetailsDialog } from '@/components/source-details-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { CampaignSelectorDialog } from '@/components/campaign-selector-dialog';
+import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
 import { Plus, Loader2, FileText } from 'lucide-react';
 
@@ -240,6 +241,13 @@ export default function SourcesPage() {
           Add Source
         </Button>
       </div>
+
+      <OnboardingHint
+        id="sources-generate"
+        title="Generate Content from Sources"
+        description='Click "Generate from Source" on any source card to create platform-optimized social posts with Claude AI. The content will be saved as tasks in your campaign.'
+        variant="compact"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sources.map((source) => (

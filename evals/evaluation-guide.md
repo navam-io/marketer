@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.11.0
+**Version:** 0.11.1
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -2392,7 +2392,321 @@ test('should handle source deletion gracefully', async ({ page }) => {
 
 ---
 
+## Feature 9: Dismissible Onboarding Hints (v0.11.1)
+
+### Test Case 9.1: Onboarding Hint Display
+
+**Prerequisites:**
+- Fresh browser session (clear localStorage)
+- At least one source exists
+
+**Steps:**
+1. Navigate to `/sources`
+2. Verify hint is displayed
+
+**Expected Results:**
+- [ ] Compact hint visible below header
+- [ ] Lightbulb icon displayed
+- [ ] Message: "Click 'Generate from Source' to create platform-optimized social posts with Claude AI"
+- [ ] Dismiss button (X) visible
+- [ ] Blue color scheme (blue-50 background)
+
+**Selectors:**
+- Hint container: Has lightbulb icon and dismiss button
+- Dismiss button: `button[aria-label="Dismiss hint"]`
+
+---
+
+### Test Case 9.2: Hint Dismissal
+
+**Steps:**
+1. Navigate to `/sources` (hint should be visible)
+2. Click dismiss button on hint
+3. Refresh page
+4. Verify hint does not reappear
+
+**Expected Results:**
+- [ ] Hint disappears immediately after dismiss
+- [ ] No animation or delay
+- [ ] After page refresh, hint stays dismissed
+- [ ] localStorage contains dismissed hint ID
+- [ ] Other hints still show on other pages
+
+**localStorage Verification:**
+```javascript
+const dismissed = JSON.parse(
+  localStorage.getItem('navam-marketer-hints-dismissed')
+);
+expect(dismissed).toContain('sources-generate');
+```
+
+---
+
+### Test Case 9.3: Multiple Hints Independence
+
+**Steps:**
+1. Navigate to `/sources`, dismiss sources hint
+2. Navigate to `/campaigns`, select campaign
+3. Verify campaigns hint still shows
+4. Dismiss campaigns hint
+5. Go back to `/sources`
+6. Verify sources hint stays dismissed
+
+**Expected Results:**
+- [ ] Each hint dismissed independently
+- [ ] Dismissing one doesn't affect others
+- [ ] All dismissed hints persist across navigation
+- [ ] localStorage tracks all dismissed hints
+
+---
+
+### Test Case 9.4: Campaign Select Hint
+
+**Prerequisites:**
+- At least two campaigns exist
+- No campaign selected yet
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Verify hint is displayed
+
+**Expected Results:**
+- [ ] Compact hint visible above campaign selector
+- [ ] Message: "Choose a campaign from the dropdown to view and manage its tasks"
+- [ ] Hint disappears when campaign is selected
+- [ ] Hint can be dismissed with X button
+- [ ] Dismissed state persists
+
+**Selectors:**
+- Hint: Contains text "Choose a campaign"
+- Campaign selector: `select` or `button[role="combobox"]`
+
+---
+
+### Test Case 9.5: Kanban Drag-Drop Hint
+
+**Prerequisites:**
+- Campaign selected
+- At least one task exists in campaign
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Select campaign with tasks
+3. Click "Tasks" tab (if not already active)
+4. Verify hint is displayed above Kanban board
+
+**Expected Results:**
+- [ ] Compact hint visible above Kanban board
+- [ ] Message: "Drag task cards between columns to update their status"
+- [ ] Hint only shows when tasks exist (not on empty state)
+- [ ] Can be dismissed
+- [ ] Dismissed state persists
+
+---
+
+### Test Case 9.6: Dashboard Metrics Hint
+
+**Prerequisites:**
+- Campaign selected
+- Campaign has posted tasks with metrics
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Select campaign
+3. Click "Overview" tab
+4. Verify hint is displayed
+
+**Expected Results:**
+- [ ] Compact hint visible above dashboard stats
+- [ ] Message: "Monitor clicks, likes, and shares. Use 'Record Metrics' button..."
+- [ ] Hint appears on Overview tab only
+- [ ] Can be dismissed
+- [ ] Dismissed state persists
+
+---
+
+### Test Case 9.7: SSR Safety (Server-Side Rendering)
+
+**Steps:**
+1. Load page with hints enabled
+2. Check browser console for errors
+3. Verify no "window is not defined" errors
+4. Verify hints render after client hydration
+
+**Expected Results:**
+- [ ] No SSR-related errors in console
+- [ ] Hints don't flash/flicker on load
+- [ ] localStorage access happens client-side only
+- [ ] Default state (dismissed) prevents flash of content
+
+---
+
+### Test Case 9.8: localStorage Corruption Handling
+
+**Steps:**
+1. Manually corrupt localStorage:
+   ```javascript
+   localStorage.setItem('navam-marketer-hints-dismissed', 'invalid-json');
+   ```
+2. Navigate to `/sources`
+3. Verify hint displays (fallback to non-dismissed state)
+4. Dismiss hint
+5. Verify localStorage is repaired with valid JSON
+
+**Expected Results:**
+- [ ] Corrupted data doesn't break app
+- [ ] Hint shows when localStorage is invalid
+- [ ] Console error logged (graceful degradation)
+- [ ] Dismissal repairs localStorage with valid JSON
+
+---
+
+### Test Case 9.9: All Hints Workflow
+
+**User Journey: First-Time User**
+
+**Steps:**
+1. Clear localStorage
+2. Navigate to `/sources` - dismiss hint
+3. Navigate to `/campaigns` - dismiss select hint
+4. Select campaign with tasks - dismiss drag-drop hint
+5. Click "Overview" tab - dismiss metrics hint
+6. Refresh browser, navigate through all pages
+7. Verify no hints reappear
+
+**Expected Results:**
+- [ ] 4 hints total across workflow
+- [ ] Each dismisses independently
+- [ ] All persist after refresh
+- [ ] localStorage contains 4 hint IDs:
+  - `sources-generate`
+  - `campaigns-select`
+  - `kanban-drag-drop`
+  - `dashboard-metrics`
+
+**localStorage State:**
+```json
+{
+  "navam-marketer-hints-dismissed": [
+    "sources-generate",
+    "campaigns-select",
+    "kanban-drag-drop",
+    "dashboard-metrics"
+  ]
+}
+```
+
+---
+
+### Test Case 9.10: Accessibility
+
+**Steps:**
+1. Navigate to page with visible hint
+2. Tab through page with keyboard
+3. Verify hint dismiss button is focusable
+4. Press Enter on focused button
+5. Verify hint dismisses
+
+**Expected Results:**
+- [ ] Dismiss button is keyboard accessible
+- [ ] Button has `aria-label="Dismiss hint"`
+- [ ] Button receives focus ring when tabbed to
+- [ ] Enter key dismisses hint
+- [ ] Screen reader announces button label
+
+**ARIA Verification:**
+```javascript
+const dismissButton = page.locator('button[aria-label="Dismiss hint"]');
+await expect(dismissButton).toHaveAttribute('aria-label', 'Dismiss hint');
+```
+
+---
+
+### Playwright Test Example: Onboarding Hints
+
+```javascript
+test('should show and dismiss onboarding hint on sources page', async ({ page }) => {
+  // Create a source first
+  await createTestSource({ title: 'Test Source' });
+
+  // Clear localStorage to simulate first visit
+  await page.evaluate(() => {
+    localStorage.clear();
+  });
+
+  await page.goto('http://localhost:3000/sources');
+
+  // Verify hint is visible
+  await expect(page.locator('text=/Generate from Source/i')).toBeVisible();
+  await expect(page.locator('button[aria-label="Dismiss hint"]')).toBeVisible();
+
+  // Dismiss hint
+  await page.click('button[aria-label="Dismiss hint"]');
+
+  // Verify hint is gone
+  await expect(page.locator('text=/Generate from Source/i')).not.toBeVisible();
+
+  // Refresh page
+  await page.reload();
+
+  // Verify hint stays dismissed
+  await expect(page.locator('text=/Generate from Source/i')).not.toBeVisible();
+
+  // Verify localStorage
+  const dismissed = await page.evaluate(() => {
+    return JSON.parse(localStorage.getItem('navam-marketer-hints-dismissed'));
+  });
+  expect(dismissed).toContain('sources-generate');
+});
+
+test('should show multiple hints independently', async ({ page }) => {
+  await createTestCampaign({ name: 'Campaign 1' });
+  await createTestCampaign({ name: 'Campaign 2' });
+
+  // Clear localStorage
+  await page.evaluate(() => localStorage.clear());
+
+  // Check sources hint
+  await page.goto('http://localhost:3000/sources');
+  await expect(page.locator('text=/Generate from Source/i')).toBeVisible();
+  await page.click('button[aria-label="Dismiss hint"]');
+
+  // Check campaigns hint
+  await page.goto('http://localhost:3000/campaigns');
+  await expect(page.locator('text=/Choose a campaign/i')).toBeVisible();
+
+  // Sources hint should stay dismissed
+  await page.goto('http://localhost:3000/sources');
+  await expect(page.locator('text=/Generate from Source/i')).not.toBeVisible();
+});
+
+test('should handle localStorage corruption gracefully', async ({ page }) => {
+  await createTestSource({ title: 'Test' });
+
+  // Corrupt localStorage
+  await page.evaluate(() => {
+    localStorage.setItem('navam-marketer-hints-dismissed', 'invalid-json');
+  });
+
+  await page.goto('http://localhost:3000/sources');
+
+  // Should show hint despite corrupted data
+  await expect(page.locator('text=/Generate from Source/i')).toBeVisible();
+
+  // Dismiss should repair localStorage
+  await page.click('button[aria-label="Dismiss hint"]');
+
+  const dismissed = await page.evaluate(() => {
+    return JSON.parse(localStorage.getItem('navam-marketer-hints-dismissed'));
+  });
+  expect(Array.isArray(dismissed)).toBe(true);
+  expect(dismissed).toContain('sources-generate');
+});
+```
+
+---
+
 **End of Browser Evaluation Guide**
-**Version 0.11.0 - Complete**
+**Version 0.11.1 - Complete**
 
 This guide is optimized for automated browser testing with Playwright. All manual setup and database verification steps have been removed, focusing purely on browser interactions and expected UI states.
