@@ -66,20 +66,27 @@ export async function createTestSource(data?: Partial<{
   });
 }
 
-export async function createTestTask(data?: Partial<{
-  campaignId: string;
-  sourceId: string;
-  platform: string;
-  status: string;
-  content: string;
-}>) {
+export async function createTestTask(
+  campaignIdOrData?: string | Partial<{
+    campaignId: string;
+    sourceId: string;
+    platform: string;
+    status: string;
+    content: string;
+  }>
+) {
+  // Support both old (string) and new (object) signature
+  const data = typeof campaignIdOrData === 'string'
+    ? { campaignId: campaignIdOrData }
+    : (campaignIdOrData || {});
+
   return await prismaTest.task.create({
     data: {
-      campaignId: data?.campaignId || null,
-      sourceId: data?.sourceId || null,
-      platform: data?.platform || 'linkedin',
-      status: data?.status || 'todo',
-      content: data?.content || 'Test task content'
+      campaignId: data.campaignId || null,
+      sourceId: data.sourceId || null,
+      platform: data.platform || 'linkedin',
+      status: data.status || 'todo',
+      content: data.content || 'Test task content'
     }
   });
 }

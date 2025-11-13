@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.10.0
+**Current Version:** v0.11.0
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -265,41 +265,71 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-## Active Improvements
+### ✅ v0.11.0 - Improved Campaign Workflow Clarity (RELEASED 2025-11-13)
 
-### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
+**Theme:** Campaign workflow clarity and source attribution
 
----
-
-#### 🟡 P1-3: Improve Campaign Workflow Clarity
-**Status:** Mostly Complete (Partially implemented across v0.7.2, v0.8.0, v0.9.0)
+#### ✅ P1-3: Improve Campaign Workflow Clarity
+**Status:** Complete (Released in v0.11.0)
+**Released:** 2025-11-13
 **Problem:** Workflow not obvious: source ingestion → campaign creation → task generation
 **Goal:** Guided experience with contextual prompts and empty states
 
-**Completed Implementation:**
+**Implementation:**
 - ✅ Breadcrumb navigation component (v0.7.2)
 - ✅ Empty states on Sources page with guidance (v0.7.1, v0.8.0)
 - ✅ Intelligent campaign workflow reducing friction (v0.9.0)
 - ✅ Auto-campaign creation from source (v0.9.0)
 - ✅ Streamlined navigation flow (v0.7.2, v0.8.0)
 - ✅ Active state indicators (v0.7.2)
+- ✅ Empty state on Campaigns page with next step guidance (v0.11.0)
+- ✅ Add `Campaign.sourceId` optional relation to track source origin (v0.11.0)
+- ✅ Show source name/link on campaign cards (v0.11.0)
+- ✅ Test suite improvements - race condition fix (v0.11.0)
 
-**Remaining Work:**
-- ⏳ Empty state on Campaigns page with next step guidance
-- ⏳ Add `Campaign.sourceId` optional relation to track source origin
-- ⏳ Show source name/link on campaign cards
-- ⏳ Dismissible onboarding hints for first-time users
+**Files Modified:**
+- `prisma/schema.prisma` - Added Campaign.sourceId relation
+- `app/api/campaigns/route.ts` - Added sourceId support
+- `app/campaigns/page.tsx` - Added empty state and source attribution
+- `app/sources/page.tsx` - Updated createCampaignFromSource
+- `jest.config.js` - Added maxWorkers: 1
+- `lib/test-utils.ts` - Improved createTestTask signature
+- `__tests__/integration/campaign-workflow.test.ts` - NEW: 8 tests
 
-**Files to Modify:**
-- `app/campaigns/page.tsx` - Add empty states for no campaigns/tasks
-- `prisma/schema.prisma` - Add optional Campaign.sourceId relation
-- `components/campaign-card.tsx` (if created) - Show source attribution
+**Results:**
+- All 192 tests passing (+8 new integration tests)
+- No regressions
+- Clear workflow guidance throughout
+- Source attribution tracking working
+- 100% reliable test execution
 
-**Tests:**
-- Integration tests for campaign-source relationship
+**See:** `backlog/release-0.11.0.md` for full details
 
-**Estimated Remaining Effort:** 1-2 hours
-**Expected Completion:** v0.11.0
+---
+
+## Active Improvements
+
+### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
+
+---
+
+#### 🟢 P2-13: Dismissible Onboarding Hints
+**Status:** Backlog (Deferred from v0.11.0)
+**Problem:** First-time users may still miss key features
+**Goal:** Subtle, dismissible hints for workflow guidance
+
+**Features:**
+- Tooltip hints on first visit to each page
+- Dismiss button with persistence (localStorage)
+- Highlight key actions (Generate, New Task, etc.)
+- Non-intrusive, progressive disclosure
+
+**Files to Create:**
+- `components/onboarding-hint.tsx` - Reusable hint component
+- `lib/onboarding.ts` - Track hint dismissals
+
+**Estimated Effort:** 2-3 hours
+**Expected Release:** v0.11.1
 
 ---
 

@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.7.3-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.11.0-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -235,6 +235,52 @@ Dedicated page for managing all your ingested content sources with full CRUD ope
 **API Endpoints**
 - `GET /api/source` - List all sources with task counts
 - `DELETE /api/source/:id` - Delete source with cascade handling
+
+</details>
+
+<details open>
+<summary><b>📊 Improved Campaign Workflow Clarity</b> <code>v0.11.0</code></summary>
+
+<br>
+
+Better workflow guidance with empty states, source attribution, and campaign-source relationships.
+
+**Empty State for Campaigns with No Tasks**
+- Helpful guidance card when campaign has no tasks
+- Two clear options with action buttons:
+  - "Generate with Claude AI" - Creates AI content from sources
+  - "Create Task Manually" - Manual post creation
+- Icons and descriptions for each option
+- Replaces empty Kanban board with actionable next steps
+
+**Campaign-Source Relationship**
+- Tracks which source inspired each campaign
+- Auto-sets sourceId when campaign created from source
+- Safe deletion: source removal preserves campaigns (sourceId → NULL)
+- Multiple campaigns can share same source
+- Full cascade handling with database integrity
+
+**Source Attribution Display**
+- Shows source name and clickable link on campaign page
+- FileText icon for visual consistency
+- External link opens in new tab
+- Appears below campaign description
+- Hidden for manually-created campaigns
+
+**Test Suite Improvements**
+- Fixed test race conditions (all 192 tests pass reliably)
+- Sequential test execution for SQLite compatibility
+- 8 new integration tests for campaign-source features
+- 100% pass rate, < 2s execution time
+
+**Schema Changes**
+- Added `Campaign.sourceId: String?` field
+- Added `Campaign.source` relation
+- OnDelete: SetNull (preserves campaigns)
+
+**API Updates**
+- `POST /api/campaigns` - Accepts optional `sourceId` parameter
+- `GET /api/campaigns` - Includes source data in response
 
 </details>
 
@@ -489,19 +535,25 @@ marketer/
 - [x] **v0.6.0** — Performance Dashboard & Analytics
 - [x] **v0.7.0** — Unified Campaign Manager
 - [x] **v0.7.1** — Source Management
+- [x] **v0.7.2** — Unified Navigation System
+- [x] **v0.7.3** — Manual Metrics Recording UI
+- [x] **v0.8.0** — Streamlined Navigation & Source Management
+- [x] **v0.8.1** — Fix Add Source Button Bug
+- [x] **v0.9.0** — Streamlined Generate from Source Workflow
+- [x] **v0.10.0** — Enhanced Source Fetch UX (Toast Notifications)
+- [x] **v0.11.0** — Improved Campaign Workflow Clarity
 
 ### 📅 Planned
 
-- [ ] **v0.7.x** — Continued Workflow Improvements
-  - Empty states and onboarding hints
-  - Manual metric recording UI
-  - Enhanced campaign management
+- [ ] **v0.11.x** — Continued UX Refinements
+  - Dismissible onboarding hints
+  - Enhanced campaign management features
 
-- [ ] **v0.8.0** — Data Management
+- [ ] **v0.12.0** — Data Management
   - Prisma migrations setup
   - Campaign export/import
 
-- [ ] **v0.9.0** — Real Outcome Delivery
+- [ ] **v0.13.0** — Real Outcome Delivery
   - LinkedIn API integration
   - Twitter/X API integration
   - Actual posting (vs. mocking)

@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.7.1
+**Version:** 0.11.0
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -2145,6 +2145,254 @@ test('should show empty state when no sources', async ({ page }) => {
 
 ---
 
+## Feature 8: Improved Campaign Workflow Clarity (v0.11.0)
+
+### Test Case 8.1: Empty State for Campaigns with No Tasks
+
+**Prerequisites:**
+- Campaign exists with no tasks
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Select a campaign that has zero tasks
+3. Verify empty state is displayed
+
+**Expected Results:**
+- [ ] Empty state card visible
+- [ ] Title: "No Tasks Yet"
+- [ ] Description: "Get started by creating tasks or generating content from your sources"
+- [ ] Two option cards visible:
+  - [ ] "Generate with Claude AI" with Sparkles icon
+  - [ ] "Create Task Manually" with Plus icon
+- [ ] Each option has description and action button
+- [ ] Clicking "Generate Content" opens GenerateContentDialog
+- [ ] Clicking "New Task" opens CreateTaskDialog
+- [ ] No Kanban board displayed (replaced by empty state)
+
+**Selectors:**
+- Empty State Card: `h2:has-text("No Tasks Yet")`
+- Generate Button: `button:has-text("Generate Content")`
+- New Task Button: `button:has-text("New Task")`
+
+---
+
+### Test Case 8.2: Campaign-Source Relationship
+
+**Prerequisites:**
+- At least one source exists
+
+**Steps:**
+1. Navigate to `/sources`
+2. Click "Generate from Source" on a source card
+3. If no campaigns exist, verify campaign is auto-created
+4. Navigate to `/campaigns`
+5. Select the newly created campaign
+6. Verify source attribution is displayed
+
+**Expected Results:**
+- [ ] Campaign auto-created with source name as campaign name
+- [ ] Campaign has sourceId set
+- [ ] Source attribution card visible below campaign description
+- [ ] Source card shows:
+  - [ ] FileText icon
+  - [ ] "Source:" label
+  - [ ] Source title as clickable link
+  - [ ] Link opens in new tab
+  - [ ] External URL matches source URL
+
+**Database Verification:**
+- [ ] Campaign.sourceId equals Source.id
+- [ ] Campaign name matches source title (or "Untitled Campaign")
+
+**Selectors:**
+- Source Attribution: Container with FileText icon
+- Source Link: `a[target="_blank"]` with source URL
+
+---
+
+### Test Case 8.3: Source Attribution Display
+
+**Steps:**
+1. Create source: "Test Blog Post" with URL "https://blog.example.com"
+2. Create campaign from source via "Generate from Source"
+3. Navigate to `/campaigns`
+4. Select the campaign
+5. Verify source attribution displays
+
+**Expected Results:**
+- [ ] Source info card visible
+- [ ] FileText icon displayed
+- [ ] Text: "Source:"
+- [ ] Link text: "Test Blog Post"
+- [ ] Link href: "https://blog.example.com"
+- [ ] Link has target="_blank" and rel="noopener noreferrer"
+- [ ] Source card only shows when campaign has source
+- [ ] Card hidden for campaigns without source
+
+---
+
+### Test Case 8.4: Source Deletion with Campaign
+
+**Steps:**
+1. Create source
+2. Create campaign from source (auto-generated)
+3. Create tasks from the campaign
+4. Delete the source
+5. Navigate to campaigns
+6. Select the campaign
+7. Verify behavior
+
+**Expected Results:**
+- [ ] Campaign still exists after source deletion
+- [ ] Tasks still exist
+- [ ] Campaign.sourceId is NULL
+- [ ] Source attribution card not displayed
+- [ ] No errors or broken states
+- [ ] Tasks still linked to campaign
+- [ ] Can still create new tasks in campaign
+
+**Database Verification:**
+```javascript
+const campaign = await prisma.campaign.findUnique({
+  where: { id },
+  include: { source: true, tasks: true }
+});
+expect(campaign.sourceId).toBeNull();
+expect(campaign.source).toBeNull();
+expect(campaign.tasks.length).toBeGreaterThan(0);
+```
+
+---
+
+### Test Case 8.5: Multiple Campaigns from Same Source
+
+**Steps:**
+1. Create one source
+2. Generate from source → Campaign 1 created
+3. Generate from source again → Choose "Create New Campaign" in selector
+4. Campaign 2 created
+5. Verify both campaigns
+
+**Expected Results:**
+- [ ] Both campaigns have same sourceId
+- [ ] Both show same source attribution
+- [ ] Source attribution link works for both
+- [ ] Deleting source sets both sourceIds to NULL
+- [ ] Both campaigns remain independent
+
+---
+
+### Test Case 8.6: Campaign Without Source
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Click "New Campaign"
+3. Create campaign manually (without source)
+4. Select the campaign
+5. Verify behavior
+
+**Expected Results:**
+- [ ] Campaign created successfully
+- [ ] Campaign.sourceId is NULL
+- [ ] No source attribution card displayed
+- [ ] Can still create tasks manually
+- [ ] Can still generate content (requires selecting source in dialog)
+- [ ] No errors or missing UI elements
+
+---
+
+### Playwright Test Example: Empty State & Source Attribution
+
+```javascript
+test('should display empty state when campaign has no tasks', async ({ page }) => {
+  const campaign = await createTestCampaign({ name: 'Empty Campaign' });
+
+  await page.goto('http://localhost:3000/campaigns');
+
+  // Select campaign
+  await page.click('button[role="combobox"]');
+  await page.click('text="Empty Campaign"');
+
+  // Verify empty state
+  await expect(page.locator('h2:has-text("No Tasks Yet")')).toBeVisible();
+  await expect(page.locator('text=/Get started by creating tasks/i')).toBeVisible();
+
+  // Verify action buttons
+  await expect(page.locator('button:has-text("Generate Content")')).toBeVisible();
+  await expect(page.locator('button:has-text("New Task")')).toBeVisible();
+
+  // Test Generate Content button
+  await page.click('button:has-text("Generate Content")');
+  await expect(page.locator('[role="dialog"]:has-text("Generate Content")')).toBeVisible();
+});
+
+test('should display source attribution for campaign created from source', async ({ page }) => {
+  // Create source
+  const source = await createTestSource({
+    title: 'My Article',
+    url: 'https://example.com/article'
+  });
+
+  // Create campaign with source
+  const campaign = await createTestCampaign({
+    name: 'My Article',
+    sourceId: source.id
+  });
+
+  await page.goto('http://localhost:3000/campaigns');
+
+  // Select campaign
+  await page.click('button[role="combobox"]');
+  await page.click('text="My Article"');
+
+  // Verify source attribution
+  await expect(page.locator('text="Source:"')).toBeVisible();
+  await expect(page.locator('a:has-text("My Article")')).toBeVisible();
+
+  // Verify link
+  const link = page.locator('a:has-text("My Article")');
+  await expect(link).toHaveAttribute('href', 'https://example.com/article');
+  await expect(link).toHaveAttribute('target', '_blank');
+  await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+});
+
+test('should handle source deletion gracefully', async ({ page }) => {
+  // Create source and campaign
+  const source = await createTestSource({ title: 'To Delete' });
+  const campaign = await createTestCampaign({
+    name: 'Campaign',
+    sourceId: source.id
+  });
+
+  // Create task
+  await createTestTask({
+    campaignId: campaign.id,
+    sourceId: source.id
+  });
+
+  // Delete source
+  await prisma.source.delete({ where: { id: source.id } });
+
+  // Navigate to campaign
+  await page.goto('http://localhost:3000/campaigns');
+  await page.click('button[role="combobox"]');
+  await page.click('text="Campaign"');
+
+  // Verify source attribution not shown
+  await expect(page.locator('text="Source:"')).not.toBeVisible();
+
+  // Verify campaign still functional
+  await expect(page.locator('text=/To Do/i')).toBeVisible(); // Kanban board
+
+  // Verify can still create tasks
+  await page.click('button:has-text("New Task")');
+  await expect(page.locator('[role="dialog"]:has-text("Create Task")')).toBeVisible();
+});
+```
+
+---
+
 **End of Browser Evaluation Guide**
+**Version 0.11.0 - Complete**
 
 This guide is optimized for automated browser testing with Playwright. All manual setup and database verification steps have been removed, focusing purely on browser interactions and expected UI states.

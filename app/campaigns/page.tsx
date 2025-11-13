@@ -26,6 +26,12 @@ interface Campaign {
   name: string;
   description?: string;
   status: string;
+  sourceId?: string;
+  source?: {
+    id: string;
+    title?: string;
+    url?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   _count: { tasks: number };
@@ -264,10 +270,30 @@ export default function CampaignsPage() {
         )}
       </div>
 
-      {selectedCampaign && selectedCampaign.description && (
+      {selectedCampaign && (selectedCampaign.description || selectedCampaign.source) && (
         <Card>
-          <CardContent className="pt-6">
-            <p className="text-slate-600">{selectedCampaign.description}</p>
+          <CardContent className="pt-6 space-y-2">
+            {selectedCampaign.description && (
+              <p className="text-slate-600">{selectedCampaign.description}</p>
+            )}
+            {selectedCampaign.source && (
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <FileText className="h-4 w-4" />
+                <span>Source:</span>
+                {selectedCampaign.source.url ? (
+                  <a
+                    href={selectedCampaign.source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {selectedCampaign.source.title || 'View Source'}
+                  </a>
+                ) : (
+                  <span>{selectedCampaign.source.title || 'Untitled Source'}</span>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -286,11 +312,66 @@ export default function CampaignsPage() {
           </TabsList>
 
           <TabsContent value="tasks" className="space-y-4 mt-6">
-            <KanbanBoard
-              tasks={tasks}
-              onTaskUpdate={handleTaskUpdate}
-              onTaskDelete={handleTaskDelete}
-            />
+            {tasks.length === 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Tasks Yet</CardTitle>
+                  <CardDescription>
+                    Get started by creating tasks or generating content from your sources
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-100 text-blue-700 rounded-full p-2 mt-0.5">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm">Generate with Claude AI</h4>
+                        <p className="text-sm text-slate-600">
+                          Use AI to create platform-optimized posts from your sources
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => setIsGenerateContentOpen(true)}
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Content
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="bg-green-100 text-green-700 rounded-full p-2 mt-0.5">
+                        <Plus className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm">Create Task Manually</h4>
+                        <p className="text-sm text-slate-600">
+                          Write and organize your own social media posts
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => setIsCreateTaskOpen(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          New Task
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <KanbanBoard
+                tasks={tasks}
+                onTaskUpdate={handleTaskUpdate}
+                onTaskDelete={handleTaskDelete}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="overview" className="space-y-6 mt-6">

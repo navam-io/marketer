@@ -90,7 +90,7 @@ export default function SourcesPage() {
     }
   };
 
-  const createCampaignFromSource = async (sourceName: string): Promise<string | null> => {
+  const createCampaignFromSource = async (sourceName: string, sourceId: string): Promise<string | null> => {
     try {
       setIsCreatingCampaign(true);
       const response = await fetch('/api/campaigns', {
@@ -98,7 +98,8 @@ export default function SourcesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: sourceName,
-          status: 'active'
+          status: 'active',
+          sourceId: sourceId
         })
       });
 
@@ -125,7 +126,7 @@ export default function SourcesPage() {
 
     // Scenario A: No campaigns exist - auto-create one
     if (currentCampaigns.length === 0) {
-      const campaignId = await createCampaignFromSource(source.title || 'Untitled Campaign');
+      const campaignId = await createCampaignFromSource(source.title || 'Untitled Campaign', source.id);
       if (campaignId) {
         setSelectedCampaignId(campaignId);
         setIsGenerateContentOpen(true);
@@ -150,7 +151,8 @@ export default function SourcesPage() {
     // If null, create new campaign from source
     if (campaignId === null && selectedSourceForGeneration) {
       const newCampaignId = await createCampaignFromSource(
-        selectedSourceForGeneration.title || 'Untitled Campaign'
+        selectedSourceForGeneration.title || 'Untitled Campaign',
+        selectedSourceForGeneration.id
       );
       if (newCampaignId) {
         setSelectedCampaignId(newCampaignId);

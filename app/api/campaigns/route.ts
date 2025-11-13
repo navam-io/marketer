@@ -6,7 +6,13 @@ export async function GET() {
   try {
     const campaigns = await prisma.campaign.findMany({
       include: {
-        tasks: true,
+        source: {
+          select: {
+            id: true,
+            title: true,
+            url: true
+          }
+        },
         _count: {
           select: { tasks: true }
         }
@@ -30,7 +36,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, status } = body;
+    const { name, description, status, sourceId } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -43,7 +49,17 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description: description || null,
-        status: status || 'active'
+        status: status || 'active',
+        sourceId: sourceId || null
+      },
+      include: {
+        source: {
+          select: {
+            id: true,
+            title: true,
+            url: true
+          }
+        }
       }
     });
 
