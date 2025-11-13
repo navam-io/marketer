@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // GET all campaigns
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const includeArchived = searchParams.get('includeArchived') === 'true';
+
     const campaigns = await prisma.campaign.findMany({
+      where: includeArchived ? {} : { archived: false },
       include: {
         source: {
           select: {

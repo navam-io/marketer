@@ -16,6 +16,8 @@ model Campaign {
   name        String
   description String?
   status      String   @default("active") // active, paused, completed
+  archived    Boolean  @default(false)    // archived flag for soft delete
+  archivedAt  DateTime? // timestamp when archived
   sourceId    String?  // Optional source this campaign originated from
   source      Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
 

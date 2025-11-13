@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.11.1
+**Version:** 0.11.2
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -2706,7 +2706,58 @@ test('should handle localStorage corruption gracefully', async ({ page }) => {
 
 ---
 
+## Feature 10: Campaign Archive Management (v0.11.2)
+
+### Test Case 10.1: Archive Campaign
+
+**Prerequisites:**
+- At least one campaign exists
+
+**Steps:**
+1. Navigate to `/campaigns`
+2. Select a campaign
+3. Click "Archive" button
+4. Verify campaign is archived
+
+**Expected Results:**
+- [ ] Archive button visible when campaign selected
+- [ ] Click archive shows campaign with `[Archived]` label in dropdown
+- [ ] Amber warning card appears
+- [ ] "Generate with Claude" and "New Task" buttons hidden
+- [ ] Archive button changes to "Unarchive"
+
+### Test Case 10.2: Show/Hide Archived Campaigns
+
+**Steps:**
+1. Create and archive a campaign
+2. Click "Show Archived" button
+3. Verify archived campaign visible
+4. Click "Hide Archived" button
+5. Verify archived campaign hidden
+
+**Expected Results:**
+- [ ] Toggle button in header
+- [ ] Button variant changes (outline/default)
+- [ ] Archived campaigns appear with `[Archived]` label
+- [ ] Default view hides archived campaigns
+
+### Test Case 10.3: Unarchive Campaign
+
+**Steps:**
+1. Archive a campaign
+2. Select the archived campaign
+3. Click "Unarchive" button
+4. Verify campaign restored
+
+**Expected Results:**
+- [ ] Unarchive button visible for archived campaigns
+- [ ] Campaign removed from archived list
+- [ ] Full functionality restored (Generate, New Task buttons)
+- [ ] Amber warning card hidden
+
+---
+
 **End of Browser Evaluation Guide**
-**Version 0.11.1 - Complete**
+**Version 0.11.2 - Complete**
 
 This guide is optimized for automated browser testing with Playwright. All manual setup and database verification steps have been removed, focusing purely on browser interactions and expected UI states.

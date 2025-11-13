@@ -20,13 +20,15 @@ import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List, FileText } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore } from 'lucide-react';
 
 interface Campaign {
   id: string;
   name: string;
   description?: string;
   status: string;
+  archived: boolean;
+  archivedAt?: Date;
   sourceId?: string;
   source?: {
     id: string;
@@ -71,6 +73,7 @@ export default function CampaignsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('tasks');
+  const [showArchived, setShowArchived] = useState(false);
 
   const {
     selectedCampaignId,
@@ -83,7 +86,8 @@ export default function CampaignsPage() {
 
   const fetchCampaigns = useCallback(async () => {
     try {
-      const response = await fetch('/api/campaigns');
+      const url = showArchived ? '/api/campaigns?includeArchived=true' : '/api/campaigns';
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch campaigns');
       const data = await response.json();
       setCampaigns(data.campaigns || []);
@@ -95,7 +99,7 @@ export default function CampaignsPage() {
     } catch (error) {
       console.error('Error fetching campaigns:', error);
     }
-  }, [selectedCampaignId, setSelectedCampaignId]);
+  }, [selectedCampaignId, setSelectedCampaignId, showArchived]);
 
   const fetchTasks = useCallback(async () => {
     if (!selectedCampaignId) {
@@ -193,6 +197,29 @@ export default function CampaignsPage() {
     await Promise.all([fetchTasks(), fetchCampaigns()]);
   };
 
+  const handleArchiveToggle = async (campaignId: string, archived: boolean) => {
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/archive`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ archived })
+      });
+
+      if (!response.ok) throw new Error('Failed to archive campaign');
+
+      // Refresh campaigns list
+      await fetchCampaigns();
+
+      // If we archived the currently selected campaign, deselect it
+      if (archived && campaignId === selectedCampaignId) {
+        setSelectedCampaignId(null);
+      }
+    } catch (error) {
+      console.error('Error archiving campaign:', error);
+      alert('Failed to archive campaign');
+    }
+  };
+
   const selectedCampaign = campaigns.find(c => c.id === selectedCampaignId);
 
   if (isLoading) {
@@ -235,6 +262,13 @@ export default function CampaignsPage() {
           <p className="text-slate-600 mt-1">Manage your marketing campaigns, tasks, and performance</p>
         </div>
         <div className="flex gap-3">
+          <Button
+            variant={showArchived ? "default" : "outline"}
+            onClick={() => setShowArchived(!showArchived)}
+          >
+            <Archive className="h-4 w-4 mr-2" />
+            {showArchived ? 'Hide Archived' : 'Show Archived'}
+          </Button>
           <Button onClick={() => setIsCreateCampaignOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Campaign
@@ -261,6 +295,7 @@ export default function CampaignsPage() {
               {campaigns.map(campaign => (
                 <SelectItem key={campaign.id} value={campaign.id}>
                   {campaign.name} ({campaign._count.tasks} tasks)
+                  {campaign.archived && ' [Archived]'}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -268,13 +303,33 @@ export default function CampaignsPage() {
         </div>
         {selectedCampaignId && (
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsGenerateContentOpen(true)}>
-              <Sparkles className="h-4 w-4 mr-2" />
-              Generate with Claude
-            </Button>
-            <Button onClick={() => setIsCreateTaskOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Task
+            {selectedCampaign && !selectedCampaign.archived && (
+              <>
+                <Button variant="outline" onClick={() => setIsGenerateContentOpen(true)}>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate with Claude
+                </Button>
+                <Button onClick={() => setIsCreateTaskOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Task
+                </Button>
+              </>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => handleArchiveToggle(selectedCampaignId, !selectedCampaign?.archived)}
+            >
+              {selectedCampaign?.archived ? (
+                <>
+                  <ArchiveRestore className="h-4 w-4 mr-2" />
+                  Unarchive
+                </>
+              ) : (
+                <>
+                  <Archive className="h-4 w-4 mr-2" />
+                  Archive
+                </>
+              )}
             </Button>
           </div>
         )}
@@ -304,6 +359,19 @@ export default function CampaignsPage() {
                 )}
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {selectedCampaign?.archived && (
+        <Card className="bg-amber-50 border-amber-200">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-amber-800">
+              <Archive className="h-5 w-5" />
+              <p className="font-medium">
+                This campaign is archived. Unarchive it to create new tasks or generate content.
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}

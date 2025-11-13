@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.11.1-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.11.2-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -328,6 +328,44 @@ Contextual, dismissible hints guide first-time users through key workflows witho
 
 </details>
 
+<details open>
+<summary><b>📦 Campaign Archive Management</b> <code>v0.11.2</code></summary>
+
+<br>
+
+Archive completed or inactive campaigns to keep your workspace organized while preserving all data.
+
+**Archive/Unarchive Functionality**
+- Archive campaigns to hide from main list
+- Unarchive to restore full functionality
+- Soft delete - no data lost
+- Preserves tasks, metrics, and relationships
+
+**Filtering & Display**
+- "Show Archived" toggle button
+- `[Archived]` label in campaign dropdown
+- Amber warning card for archived campaigns
+- Default view shows only active campaigns
+
+**Functional Restrictions**
+- Archived campaigns are view-only
+- Cannot create tasks or generate content
+- Can still record metrics on existing posts
+- Unarchive to enable full editing
+
+**Implementation**
+- Database fields: `archived` (boolean), `archivedAt` (timestamp)
+- API endpoint: `PATCH /api/campaigns/[id]/archive`
+- Query filter: `GET /api/campaigns?includeArchived=true`
+- Soft delete pattern for data preservation
+
+**Test Coverage**
+- 14 new integration tests
+- All 241 tests passing
+- Tests archive, unarchive, filtering, data preservation
+
+</details>
+
 ---
 
 ## 🚀 Quick Start
@@ -587,6 +625,7 @@ marketer/
 - [x] **v0.10.0** — Enhanced Source Fetch UX (Toast Notifications)
 - [x] **v0.11.0** — Improved Campaign Workflow Clarity
 - [x] **v0.11.1** — Dismissible Onboarding Hints
+- [x] **v0.11.2** — Campaign Archive Management
 
 ### 📅 Planned
 

@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.11.1
+**Current Version:** v0.11.2
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -350,6 +350,37 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
+### ✅ v0.11.2 - Campaign Archive Management (RELEASED 2025-11-13)
+
+**Theme:** Campaign organization and lifecycle management
+
+#### ✅ P2-5a: Campaign Archive Functionality
+**Status:** Complete (Released in v0.11.2)
+**Released:** 2025-11-13
+**Problem:** No way to hide completed/inactive campaigns
+**Goal:** Archive campaigns to declutter UI while preserving data
+
+**Implementation:**
+- ✅ Added Campaign.archived and Campaign.archivedAt fields
+- ✅ Created PATCH /api/campaigns/[id]/archive endpoint
+- ✅ Updated GET /api/campaigns with includeArchived filter
+- ✅ Added Show Archived toggle button in UI
+- ✅ Added Archive/Unarchive button per campaign
+- ✅ Added archived status indicators ([Archived] label)
+- ✅ Added amber warning card for archived campaigns
+- ✅ Disabled action buttons for archived campaigns
+- ✅ Comprehensive test coverage (14 new tests)
+
+**Results:**
+- All 241 tests passing (+14 new tests)
+- Soft delete preserves all data
+- Clear visual indicators
+- Easy archive/restore workflow
+
+**See:** `backlog/release-0.11.2.md` for full details
+
+---
+
 ## Active Improvements
 
 ### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
@@ -657,5 +688,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Current Status:** v0.11.1 released - Ready for v0.11.2 planning
-**Recent Momentum:** 12 releases in 2 weeks with 6 major improvements completed
+**Current Status:** v0.11.2 released - Ready for v0.11.3 planning
+**Recent Momentum:** 13 releases in 2 weeks with 7 major improvements completed
