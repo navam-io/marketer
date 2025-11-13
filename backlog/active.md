@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.7.1
+**Current Version:** v0.10.0
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -19,10 +19,11 @@ The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature sl
 - ✅ Slice 5: Performance Dashboard (v0.6.0)
 
 **Achievement Highlights:**
-- 🚀 7 releases in rapid iteration (including patches v0.7.0 & v0.7.1)
-- 🧪 78 integration tests, 100% pass rate, <1s execution
-- 📦 Full tech stack: Next.js 15, Prisma, Claude AI, dnd-kit, Recharts
-- 📚 Comprehensive documentation and release notes
+- 🚀 10 releases in rapid iteration (v0.1.0 → v0.10.0, all in 2 weeks!)
+- 🧪 Comprehensive test coverage, 100% pass rate, <2s execution
+- 📦 Full tech stack: Next.js 15, Prisma, Claude AI, dnd-kit, Recharts, Sonner
+- 📚 Complete documentation with detailed release notes for every version
+- ✨ 5 major issues resolved (unified navigation, streamlined workflows, toast notifications)
 
 **Archive Note:** The original slice-based planning document has been preserved in `backlog/archive/active-slices-v0.1-v0.6.md` for historical reference.
 
@@ -30,13 +31,13 @@ The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature sl
 
 ## Current Focus: Improvement Phase
 
-Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs/tests-coverage.md`), we're now focusing on:
+Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs/tests-coverage.md`), the improvement phase has achieved:
 
-1. **UX & Navigation Improvements** - Fix architectural divergence, improve workflow clarity
-2. **UI Completeness** - Add UI for existing API features
-3. **Data Management** - Better persistence and migration strategy
-4. **Real Outcome Delivery** - Actual social media posting (vs. mocking)
-5. **Testing & Quality** - Expand test coverage beyond integration tests
+1. ✅ **UX & Navigation Improvements** - Unified navigation, breadcrumbs, streamlined workflows (v0.7.2, v0.8.0, v0.9.0)
+2. ✅ **UI Completeness** - Manual metrics recording, toast notifications, source details viewer (v0.7.3, v0.10.0)
+3. ⏳ **Data Management** - Migration strategy and export/import (planned for v0.12.x)
+4. ⏳ **Real Outcome Delivery** - Actual social media posting via API (planned for v0.13.0)
+5. ⏳ **Testing & Quality** - Expand component and accessibility tests (ongoing)
 
 **Planning Reference:** See `backlog/improvements-v0.7-planning.md` for detailed analysis and prioritization framework.
 
@@ -104,73 +105,209 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
+### ✅ v0.7.2 - Unified Navigation (RELEASED 2025-11-13)
+
+**Theme:** Navigation consolidation and workflow clarity
+
+#### ✅ Issue #1: Unified Navigation System
+**Status:** Complete (Released in v0.7.2)
+**Released:** 2025-11-13
+**Problem:** Dual navigation (top app bar + page-specific buttons) wasted screen space and lacked workflow context
+**Solution:** Single, unified navigation component with breadcrumbs and active states
+
+**Implementation:**
+- ✅ Created unified Navigation component
+- ✅ Added breadcrumb trail showing workflow context
+- ✅ Active state indicators for current page
+- ✅ Consistent navigation across all pages
+- ✅ Saved ~80px vertical space per page
+- ✅ Enhanced home page with better onboarding
+
+**Results:**
+- All 78 tests passing
+- Consistent navigation UX
+- Clear workflow progression
+- Improved screen real estate utilization
+
+**See:** `backlog/release-0.7.2.md` for full details
+
+---
+
+### ✅ v0.7.3 - Manual Metrics Recording UI (RELEASED 2025-11-13)
+
+**Theme:** UI completeness for existing API features
+
+#### ✅ P1-4: Manual Metric Recording UI
+**Status:** Complete (Released in v0.7.3)
+**Released:** 2025-11-13
+**Problem:** Could only record clicks automatically, no UI for likes/shares/comments
+**Solution:** Added manual metric recording dialog with quick actions
+
+**Implementation:**
+- ✅ Created RecordMetricsDialog component
+- ✅ Added "Record Metrics" button on posted task cards
+- ✅ Quick action buttons: "+1 Like", "+1 Share"
+- ✅ Manual entry form for any metric type/value
+- ✅ Real-time metric badge updates on cards
+- ✅ Comprehensive test coverage (16 new tests)
+
+**Results:**
+- All 94 tests passing (+16 new)
+- Complete metrics recording workflow
+- Intuitive quick actions for common operations
+- All existing API features now have UI
+
+**See:** `backlog/release-0.7.3.md` for full details
+
+---
+
+### ✅ v0.8.0 - Streamlined Navigation & Source Management (RELEASED 2025-11-13)
+
+**Theme:** Remove redundancy, consolidate workflows
+
+#### ✅ Issue #2: Remove Redundant Home Page Source Ingestion
+**Status:** Complete (Released in v0.8.0)
+**Released:** 2025-11-13
+**Problem:** Duplicate source ingestion on both home page and sources page caused confusion
+**Solution:** Consolidated all source management into modal dialog on Sources page
+
+**Implementation:**
+- ✅ Created AddSourceDialog modal component
+- ✅ Removed source ingestion from home page
+- ✅ "Add Source" button opens modal in-context
+- ✅ Streamlined home page focused on onboarding
+- ✅ Updated navigation flow
+- ✅ Home page bundle reduced by 93% (2.56 kB → 174 B)
+
+**Results:**
+- All 94 tests passing
+- Single, clear location for source management
+- Cleaner navigation flow
+- Dramatically improved home page performance
+
+**See:** `backlog/release-0.8.0.md` for full details
+
+---
+
+### ✅ v0.8.1 - Fix Add Source Button Not Working (RELEASED 2025-11-13)
+
+**Theme:** Bug fix
+
+**Status:** Complete (Released in v0.8.1)
+**Released:** 2025-11-13
+**Problem:** "Add Your First Source" button on empty state didn't work
+**Root Cause:** AddSourceDialog not rendered in empty state return block
+**Solution:** One-line fix to ensure dialog always renders
+
+**Results:**
+- All 94 tests passing
+- Empty state button functional
+- No regressions
+
+**See:** `backlog/release-0.8.1.md` for full details
+
+---
+
+### ✅ v0.9.0 - Streamlined Generate from Source Workflow (RELEASED 2025-11-13)
+
+**Theme:** Intelligent workflow automation
+
+#### ✅ Issue #5: Remove Campaign Creation Friction
+**Status:** Complete (Released in v0.9.0)
+**Released:** 2025-11-13
+**Problem:** "Generate from Source" required manual campaign creation first, blocking new users
+**Solution:** Intelligent campaign handling based on current state
+
+**Implementation:**
+- ✅ Auto-create campaign when none exist (named after source)
+- ✅ Auto-select campaign when only one exists
+- ✅ Show campaign selector when multiple exist
+- ✅ Campaign selector allows creating new campaign from source
+- ✅ Auto-navigate to Campaigns view after generation
+- ✅ Reduced workflow from 8 steps to 2-3 steps
+
+**Results:**
+- All 94 tests passing
+- Seamless first-time user experience
+- 60-75% reduction in workflow friction
+- Intelligent, context-aware behavior
+
+**See:** `backlog/release-0.9.0.md` for full details
+
+---
+
+### ✅ v0.10.0 - Enhanced Source Fetch UX (RELEASED 2025-11-13)
+
+**Theme:** Toast notifications and content viewer
+
+#### ✅ Issue #3: Improve Source Fetch UX
+**Status:** Complete (Released in v0.10.0)
+**Released:** 2025-11-13
+**Problem:** Janky redirect after source fetch, no way to review full source content later
+**Solution:** Toast notification system + source details viewer modal
+
+**Implementation:**
+- ✅ Added Sonner toast library for notifications
+- ✅ Dialog closes immediately with "Processing source..." toast
+- ✅ Success toast shown when source is added
+- ✅ Error toast shown on failure (dialog reopens for retry)
+- ✅ Created SourceDetailsDialog for viewing full content
+- ✅ Added "View Details" button (eye icon) on source cards
+- ✅ Comprehensive test coverage (35 tests, all passing)
+
+**Results:**
+- All tests passing (updated for new behavior)
+- Smooth, professional UX
+- Users can review source content anytime
+- Toast system available for future features
+
+**See:** `backlog/release-0.10.0.md` for full details
+
+---
+
 ## Active Improvements
 
-### 🚧 v0.7.x - Continued UX Improvements (IN PLANNING)
+### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
 
 ---
 
 #### 🟡 P1-3: Improve Campaign Workflow Clarity
-**Status:** Planned
+**Status:** Mostly Complete (Partially implemented across v0.7.2, v0.8.0, v0.9.0)
 **Problem:** Workflow not obvious: source ingestion → campaign creation → task generation
 **Goal:** Guided experience with contextual prompts and empty states
 
-**Implementation Plan:**
-- Add empty state messages with next step guidance
-  - No sources: "Get started by adding a content source"
-  - No campaigns: "Create your first campaign to organize tasks"
-  - No tasks: "Generate content from a source or create manually"
-- Add breadcrumb navigation component
-- Add campaign description field to show which source was used
-- Add onboarding hints (can be dismissed)
+**Completed Implementation:**
+- ✅ Breadcrumb navigation component (v0.7.2)
+- ✅ Empty states on Sources page with guidance (v0.7.1, v0.8.0)
+- ✅ Intelligent campaign workflow reducing friction (v0.9.0)
+- ✅ Auto-campaign creation from source (v0.9.0)
+- ✅ Streamlined navigation flow (v0.7.2, v0.8.0)
+- ✅ Active state indicators (v0.7.2)
 
-**Files to Create:**
-- `components/empty-state.tsx` - Reusable empty state component
-- `components/breadcrumbs.tsx` - Navigation breadcrumbs
+**Remaining Work:**
+- ⏳ Empty state on Campaigns page with next step guidance
+- ⏳ Add `Campaign.sourceId` optional relation to track source origin
+- ⏳ Show source name/link on campaign cards
+- ⏳ Dismissible onboarding hints for first-time users
 
 **Files to Modify:**
-- `app/campaigns/page.tsx` - Add empty states
-- `app/sources/page.tsx` - Add empty states
-- Schema: Add `Campaign.sourceId` optional relation
+- `app/campaigns/page.tsx` - Add empty states for no campaigns/tasks
+- `prisma/schema.prisma` - Add optional Campaign.sourceId relation
+- `components/campaign-card.tsx` (if created) - Show source attribution
 
 **Tests:**
-- Component tests for empty states
 - Integration tests for campaign-source relationship
 
-**Estimated Effort:** 2-3 hours
-**Expected Release:** v0.7.0
-
----
-
-**Total v0.7.0 Effort:** ~9-13 hours
-**Release Criteria:**
-- All 3 improvements implemented
-- Tests passing (target: 80+ tests)
-- Documentation updated (README, release notes)
-- Manual testing of new navigation flow
+**Estimated Remaining Effort:** 1-2 hours
+**Expected Completion:** v0.11.0
 
 ---
 
 ## Backlog - Future Improvements
 
-### v0.7.x - UI Completeness (Patches)
+### v0.11.x - UI & UX Refinements
 
-#### ✅ P1-4: Manual Metric Recording UI
-**Status:** Completed (v0.7.3)
-**Problem:** Can only record clicks automatically, no UI for likes/shares
-**Goal:** Manual metric entry for engagement tracking
 
-**Features:**
-- "Record Metrics" button on posted task cards
-- Dialog with metric type (like, share, comment) and value input
-- Quick actions: "+1 Like", "+1 Share" buttons
-- Show current metrics as badges on cards
-
-**API:** Already exists (POST /api/metrics)
-**Estimated Effort:** 2-3 hours
-**Expected Release:** v0.7.1
-
----
 
 #### 🟢 P2-5: Enhanced Campaign Management
 **Status:** Backlog
@@ -189,11 +326,11 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 - Add `Campaign.archivedAt: DateTime?`
 
 **Estimated Effort:** 3-4 hours
-**Expected Release:** v0.7.2
+**Expected Release:** v0.11.0
 
 ---
 
-### v0.8.0 - Data Management (Minor Release)
+### v0.12.0 - Data Management (Minor Release)
 
 #### 🟡 P1-6: Prisma Migrations Setup
 **Status:** Backlog
@@ -212,7 +349,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 - Document migration workflow
 
 **Estimated Effort:** 2-3 hours
-**Expected Release:** v0.8.0
+**Expected Release:** v0.12.0
 
 ---
 
@@ -232,11 +369,11 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 - `POST /api/campaigns/import`
 
 **Estimated Effort:** 4-5 hours
-**Expected Release:** v0.8.1
+**Expected Release:** v0.12.1
 
 ---
 
-### v0.9.0 - Real Outcome Delivery (Minor Release)
+### v0.13.0 - Real Outcome Delivery (Minor Release)
 
 #### 🟡 P1-8: LinkedIn API Integration
 **Status:** Backlog
@@ -262,7 +399,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 - Add `Task.publishError: String?`
 
 **Estimated Effort:** 8-10 hours
-**Expected Release:** v0.9.0
+**Expected Release:** v0.13.0
 
 ---
 
@@ -281,7 +418,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 **Similar to LinkedIn integration but with Twitter API**
 
 **Estimated Effort:** 6-8 hours
-**Expected Release:** v0.9.1
+**Expected Release:** v0.13.1
 
 ---
 
@@ -467,4 +604,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Status:** Ready for v0.7.0 development
+**Current Status:** v0.10.0 released - Ready for v0.11.0 planning
+**Recent Momentum:** 10 releases in 2 weeks with 5 major issues resolved
