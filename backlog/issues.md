@@ -17,14 +17,22 @@
 
 ---
 
+[x] **Issue #2 - Remove Redundant Home Page** (Resolved in v0.8.0)
+
+**Problem:** Now with sources view, the home view is redundant. Source ingestion url box should be a modal on Sources page which comes up when user clicks Add Source button.
+
+**Solution:** Created AddSourceDialog modal component:
+- Modal dialog on Sources page for adding sources
+- Removed source ingestion from home page
+- Simplified home page to focus on onboarding
+- Single, clear location for source management
+- Home page bundle reduced by 93% (2.56 kB → 174 B)
+
+**See:** `backlog/release-0.8.0.md` for details
+
+---
+
 ## Active
-
-[ ] **Issue #2 - Remove Redundant Home Page**
-
-Now with sources view, the home view is redundant. Source ingestion url box should be a modal on Sources page which comes up when user clicks Add Source button.
-
-**Priority:** Medium
-**Estimated Effort:** 2-3 hours
 
 ---
 

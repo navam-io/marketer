@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { SourceIngestion } from '@/components/source-ingestion';
 import { ArrowRight, FolderKanban, FileText, Sparkles } from 'lucide-react';
 
 export default function Home() {
@@ -32,10 +31,10 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
-                Add URLs, view ingested content, and generate posts from sources.
+                Add content sources by URL. Extract and save clean, readable content for AI-powered post generation.
               </p>
               <Button variant="outline" className="w-full">
-                View Sources
+                Manage Sources
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
@@ -79,23 +78,63 @@ export default function Home() {
             <ol className="text-sm space-y-2 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="font-semibold text-foreground">1.</span>
-                Add a content source
+                Go to Sources and add content URLs
               </li>
               <li className="flex items-start gap-2">
                 <span className="font-semibold text-foreground">2.</span>
-                Create a campaign
+                Create a campaign on Campaigns page
               </li>
               <li className="flex items-start gap-2">
                 <span className="font-semibold text-foreground">3.</span>
-                Generate posts with AI
+                Generate and schedule AI-powered posts
               </li>
             </ol>
           </CardContent>
         </Card>
       </div>
 
-      {/* Source Ingestion */}
-      <SourceIngestion />
+      {/* Workflow Description */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle>How It Works</CardTitle>
+          <CardDescription>Your content marketing automation workflow</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0">
+              1
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">Add Sources</h3>
+              <p className="text-sm text-muted-foreground">
+                Navigate to the Sources page and click "Add Source". Paste URLs from your blog posts, articles, or any web content you want to repurpose.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0">
+              2
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">Create Campaigns</h3>
+              <p className="text-sm text-muted-foreground">
+                Organize your social media efforts into campaigns. Each campaign has its own Kanban board to manage tasks across different platforms.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-semibold flex-shrink-0">
+              3
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">Generate & Schedule</h3>
+              <p className="text-sm text-muted-foreground">
+                Use AI to transform your source content into platform-optimized posts for LinkedIn, Twitter, and blogs. Review, edit, schedule, and track performance.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SourceCard } from '@/components/source-card';
+import { AddSourceDialog } from '@/components/add-source-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, FileText, Home } from 'lucide-react';
+import { Plus, Loader2, FileText } from 'lucide-react';
 
 interface Source {
   id: string;
@@ -25,6 +25,7 @@ export default function SourcesPage() {
   const router = useRouter();
   const [sources, setSources] = useState<Source[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddSourceOpen, setIsAddSourceOpen] = useState(false);
   const { isGenerateContentOpen, setIsGenerateContentOpen, selectedCampaignId } = useAppStore();
 
   const fetchSources = useCallback(async () => {
@@ -77,6 +78,11 @@ export default function SourcesPage() {
     fetchSources();
   };
 
+  const handleSourceAdded = () => {
+    // Refresh sources list
+    fetchSources();
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto py-8">
@@ -105,12 +111,10 @@ export default function SourcesPage() {
               <p className="text-slate-600 mb-4 max-w-md mx-auto">
                 Get started by adding a content source. Paste any blog post, article, or web page URL to extract and repurpose content.
               </p>
-              <Link href="/">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Your First Source
-                </Button>
-              </Link>
+              <Button onClick={() => setIsAddSourceOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Source
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -127,12 +131,10 @@ export default function SourcesPage() {
             Manage your content sources and generate posts
           </p>
         </div>
-        <Link href="/">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Source
-          </Button>
-        </Link>
+        <Button onClick={() => setIsAddSourceOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Source
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -145,6 +147,12 @@ export default function SourcesPage() {
           />
         ))}
       </div>
+
+      <AddSourceDialog
+        open={isAddSourceOpen}
+        onOpenChange={setIsAddSourceOpen}
+        onSourceAdded={handleSourceAdded}
+      />
 
       {selectedCampaignId && (
         <GenerateContentDialog
