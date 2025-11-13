@@ -32,6 +32,18 @@
 
 ---
 
+[x] **Issue #4 - Add Source Button Not Working** (Resolved in v0.8.1)
+
+**Problem:** Clicking "Add Your First Source" button on the Sources page empty state did nothing. The AddSourceDialog was not opening.
+
+**Root Cause:** AddSourceDialog component was only rendered in the main return statement, not in the empty state early return. When there were no sources, the component never mounted.
+
+**Solution:** Added AddSourceDialog component to the empty state return block, ensuring it's always rendered regardless of sources count.
+
+**See:** One-line fix in `app/sources/page.tsx`
+
+---
+
 ## Active
 
 ---

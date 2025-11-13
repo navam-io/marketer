@@ -118,6 +118,12 @@ export default function SourcesPage() {
             </div>
           </CardContent>
         </Card>
+
+        <AddSourceDialog
+          open={isAddSourceOpen}
+          onOpenChange={setIsAddSourceOpen}
+          onSourceAdded={handleSourceAdded}
+        />
       </div>
     );
   }
