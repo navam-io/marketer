@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { SourceCard } from '@/components/source-card';
 import { AddSourceDialog } from '@/components/add-source-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
+import { CampaignSelectorDialog } from '@/components/campaign-selector-dialog';
 import { useAppStore } from '@/lib/store';
 import { Plus, Loader2, FileText } from 'lucide-react';
 
@@ -21,12 +22,22 @@ interface Source {
   };
 }
 
+interface Campaign {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export default function SourcesPage() {
   const router = useRouter();
   const [sources, setSources] = useState<Source[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddSourceOpen, setIsAddSourceOpen] = useState(false);
-  const { isGenerateContentOpen, setIsGenerateContentOpen, selectedCampaignId } = useAppStore();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [isCampaignSelectorOpen, setIsCampaignSelectorOpen] = useState(false);
+  const [selectedSourceForGeneration, setSelectedSourceForGeneration] = useState<Source | null>(null);
+  const [isCreatingCampaign, setIsCreatingCampaign] = useState(false);
+  const { isGenerateContentOpen, setIsGenerateContentOpen, selectedCampaignId, setSelectedCampaignId } = useAppStore();
 
   const fetchSources = useCallback(async () => {
     try {
@@ -42,9 +53,23 @@ export default function SourcesPage() {
     }
   }, []);
 
+  const fetchCampaigns = useCallback(async () => {
+    try {
+      const response = await fetch('/api/campaigns');
+      if (!response.ok) throw new Error('Failed to fetch campaigns');
+      const data = await response.json();
+      setCampaigns(data.campaigns || []);
+      return data.campaigns || [];
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      return [];
+    }
+  }, []);
+
   useEffect(() => {
     fetchSources();
-  }, [fetchSources]);
+    fetchCampaigns();
+  }, [fetchSources, fetchCampaigns]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -62,20 +87,83 @@ export default function SourcesPage() {
     }
   };
 
-  const handleGenerate = () => {
-    // Check if a campaign is selected, if not, prompt user to create/select one
-    if (!selectedCampaignId) {
-      alert('Please create or select a campaign first from the Campaigns page.');
-      router.push('/campaigns');
+  const createCampaignFromSource = async (sourceName: string): Promise<string | null> => {
+    try {
+      setIsCreatingCampaign(true);
+      const response = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: sourceName,
+          status: 'active'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to create campaign');
+
+      const data = await response.json();
+      await fetchCampaigns(); // Refresh campaigns list
+      return data.campaign.id;
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      alert('Failed to create campaign');
+      return null;
+    } finally {
+      setIsCreatingCampaign(false);
+    }
+  };
+
+  const handleGenerate = async (source: Source) => {
+    // Store the source for generation
+    setSelectedSourceForGeneration(source);
+
+    // Fetch latest campaigns
+    const currentCampaigns = await fetchCampaigns();
+
+    // Scenario A: No campaigns exist - auto-create one
+    if (currentCampaigns.length === 0) {
+      const campaignId = await createCampaignFromSource(source.title || 'Untitled Campaign');
+      if (campaignId) {
+        setSelectedCampaignId(campaignId);
+        setIsGenerateContentOpen(true);
+      }
       return;
     }
 
-    setIsGenerateContentOpen(true);
+    // Scenario B: One campaign exists - use it automatically
+    if (currentCampaigns.length === 1) {
+      setSelectedCampaignId(currentCampaigns[0].id);
+      setIsGenerateContentOpen(true);
+      return;
+    }
+
+    // Scenario C: Multiple campaigns exist - show selector
+    setIsCampaignSelectorOpen(true);
+  };
+
+  const handleCampaignSelected = async (campaignId: string | null) => {
+    setIsCampaignSelectorOpen(false);
+
+    // If null, create new campaign from source
+    if (campaignId === null && selectedSourceForGeneration) {
+      const newCampaignId = await createCampaignFromSource(
+        selectedSourceForGeneration.title || 'Untitled Campaign'
+      );
+      if (newCampaignId) {
+        setSelectedCampaignId(newCampaignId);
+        setIsGenerateContentOpen(true);
+      }
+    } else if (campaignId) {
+      setSelectedCampaignId(campaignId);
+      setIsGenerateContentOpen(true);
+    }
   };
 
   const handleContentGenerated = () => {
     // Refresh sources to update task counts
     fetchSources();
+    // Navigate to campaigns view with the selected campaign
+    router.push('/campaigns');
   };
 
   const handleSourceAdded = () => {
@@ -160,9 +248,19 @@ export default function SourcesPage() {
         onSourceAdded={handleSourceAdded}
       />
 
+      <CampaignSelectorDialog
+        open={isCampaignSelectorOpen}
+        onOpenChange={setIsCampaignSelectorOpen}
+        campaigns={campaigns}
+        sourceName={selectedSourceForGeneration?.title || 'Untitled Source'}
+        onSelect={handleCampaignSelected}
+        isCreatingCampaign={isCreatingCampaign}
+      />
+
       {selectedCampaignId && (
         <GenerateContentDialog
           campaignId={selectedCampaignId}
+          sourceId={selectedSourceForGeneration?.id}
           open={isGenerateContentOpen}
           onOpenChange={setIsGenerateContentOpen}
           onContentGenerated={handleContentGenerated}

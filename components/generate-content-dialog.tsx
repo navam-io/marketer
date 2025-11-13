@@ -24,6 +24,7 @@ import { Loader2 } from 'lucide-react';
 
 interface GenerateContentDialogProps {
   campaignId?: string;
+  sourceId?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onContentGenerated: () => void;
@@ -52,6 +53,7 @@ const TONES = [
 
 export function GenerateContentDialog({
   campaignId,
+  sourceId,
   open,
   onOpenChange,
   onContentGenerated
@@ -64,6 +66,13 @@ export function GenerateContentDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingSources, setLoadingSources] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Pre-select source if sourceId is provided
+  useEffect(() => {
+    if (sourceId) {
+      setSelectedSourceId(sourceId);
+    }
+  }, [sourceId]);
 
   // Load sources when dialog opens
   useEffect(() => {
@@ -80,8 +89,8 @@ export function GenerateContentDialog({
       const data = await response.json();
       setSources(data.sources || []);
 
-      // Auto-select first source if available
-      if (data.sources && data.sources.length > 0 && !selectedSourceId) {
+      // Auto-select first source if available and no sourceId was provided
+      if (data.sources && data.sources.length > 0 && !selectedSourceId && !sourceId) {
         setSelectedSourceId(data.sources[0].id);
       }
     } catch (err) {

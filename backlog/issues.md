@@ -44,9 +44,22 @@
 
 ---
 
-## Active
+[x] **Issue #5 - Streamline Generate from Source Workflow** (Resolved in v0.9.0)
+
+**Problem:** Clicking "Generate from Source" button on a source card required a campaign to exist, showing alert: "Please create or select a campaign first from the Campaigns page." This created unnecessary friction, especially for first-time users.
+
+**Solution:** Implemented intelligent workflow based on campaign state:
+- **No campaigns:** Auto-creates campaign named after source
+- **One campaign:** Uses it automatically
+- **Multiple campaigns:** Shows campaign selector dialog
+- After generation, automatically navigates to Campaigns view
+- Campaign selector allows creating new campaign from source
+
+**See:** `backlog/release-0.9.0.md` for details
 
 ---
+
+## Active
 
 [ ] **Issue #3 - Improve Source Fetch UX**
 
