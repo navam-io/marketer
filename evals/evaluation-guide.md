@@ -1,6 +1,6 @@
 # Navam Marketer - Browser Evaluation Guide
 
-**Version:** 0.6.0
+**Version:** 0.7.0
 **Test Environment:** Assumes app is running at `http://localhost:3000`
 **Purpose:** Automated browser testing with Playwright
 
@@ -1457,6 +1457,265 @@ test('should track clicks via redirect', async ({ page }) => {
   expect(data.metrics).toHaveLength(1);
   expect(data.metrics[0].type).toBe('click');
   expect(data.metrics[0].value).toBe(1);
+});
+```
+
+---
+
+## Feature 6: Unified Campaign Manager (v0.7.0)
+
+### Test Case 6.1: Navigate to Campaigns with Tabs
+
+**Steps:**
+1. Navigate to `http://localhost:3000/campaigns`
+2. Select a campaign from dropdown
+3. Verify tabbed interface appears
+
+**Expected Results:**
+- [ ] Two tabs visible: "Tasks" and "Overview"
+- [ ] Tasks tab is selected by default
+- [ ] Tab icons visible (List for Tasks, BarChart3 for Overview)
+- [ ] No separate Dashboard link in header (removed)
+- [ ] Kanban board visible in Tasks tab
+
+**Selectors:**
+- Tabs Container: `[role="tablist"]`
+- Tasks Tab: `button[data-state="active"]:has-text("Tasks")`
+- Overview Tab: `button:has-text("Overview")`
+- Kanban Board: Container with columns
+
+---
+
+### Test Case 6.2: Switch to Overview Tab
+
+**Steps:**
+1. Navigate to campaigns and select a campaign
+2. Click "Overview" tab
+3. Wait for dashboard content to load
+
+**Expected Results:**
+- [ ] Overview tab becomes active
+- [ ] Tasks tab becomes inactive
+- [ ] KPI cards appear (Total Posts, Clicks, Likes, Shares)
+- [ ] Engagement chart appears
+- [ ] Link tracking info card appears
+- [ ] Content specific to selected campaign
+
+**Selectors:**
+- Overview Tab: `button:has-text("Overview")`
+- KPI Cards: Multiple cards with metrics
+- Chart: Recharts container with "Engagement Over Time"
+
+---
+
+### Test Case 6.3: Verify Campaign-Filtered Metrics
+
+**Steps:**
+1. Create two campaigns with tasks and metrics
+2. Navigate to campaigns page
+3. Select Campaign 1
+4. Click "Overview" tab
+5. Note the metrics values
+6. Switch to Campaign 2
+7. Verify metrics change
+
+**Expected Results:**
+- [ ] Metrics show only for selected campaign
+- [ ] Values change when switching campaigns
+- [ ] Chart data updates per campaign
+- [ ] No global/all-campaigns metrics shown
+
+**Verification:**
+- Campaign 1 metrics != Campaign 2 metrics
+- Switching campaigns triggers stats refresh
+- Empty state shown if campaign has no metrics
+
+---
+
+### Test Case 6.4: Dashboard Redirect
+
+**Steps:**
+1. Navigate directly to `http://localhost:3000/dashboard`
+2. Wait for redirect
+
+**Expected Results:**
+- [ ] Redirects to `/campaigns` URL
+- [ ] Shows "Redirecting to campaigns..." message briefly
+- [ ] Lands on campaigns page
+- [ ] No 404 or error
+
+**Timing:**
+- Redirect should happen immediately
+- No hanging or stuck states
+
+---
+
+### Test Case 6.5: Tab Persistence Within Session
+
+**Steps:**
+1. Navigate to campaigns
+2. Select a campaign
+3. Click "Overview" tab
+4. Click "Tasks" tab
+5. Click "Overview" tab again
+
+**Expected Results:**
+- [ ] Tab switching is instant (no network delays)
+- [ ] Content switches smoothly
+- [ ] No flickering or layout shifts
+- [ ] No full page reloads
+
+**Note:** Tab state resets on page refresh (known limitation)
+
+---
+
+### Test Case 6.6: Empty State in Overview Tab
+
+**Steps:**
+1. Create a new campaign with no tasks
+2. Navigate to campaigns and select it
+3. Click "Overview" tab
+
+**Expected Results:**
+- [ ] KPI cards show all zeros
+- [ ] Chart shows empty state message
+- [ ] Message: "No engagement data yet"
+- [ ] Helpful text about metrics appearing
+- [ ] No errors or broken states
+
+---
+
+### Test Case 6.7: Overview Tab Content
+
+**URL:** `http://localhost:3000/campaigns` → Overview tab
+
+**Expected Elements:**
+- [ ] KPI Cards Grid (4 cards):
+  - Total Posts (blue)
+  - Total Clicks (green)
+  - Total Likes (pink)
+  - Total Shares (purple)
+- [ ] Engagement Chart:
+  - Title: "Engagement Over Time (Last 30 Days)"
+  - Description: "Track clicks, likes, and shares for this campaign"
+  - Line chart with three lines
+  - Responsive container
+- [ ] Link Tracking Info Card (blue background):
+  - Title: "💡 Track Link Clicks"
+  - Instructions for using `/r/{taskId}?url={destination}`
+  - Code block with example URL
+  - Helpful explanation text
+
+---
+
+### Playwright Test Example: Unified Campaign Manager
+
+```javascript
+test('should display unified campaign manager with tabs', async ({ page }) => {
+  // Setup: Create campaign and task
+  const campaign = await createTestCampaign();
+  const task = await createTestTask({ campaignId: campaign.id, status: 'posted' });
+
+  // Add metrics
+  await fetch('http://localhost:3000/api/metrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ taskId: task.id, type: 'click', value: 10 })
+  });
+
+  // Navigate to campaigns
+  await page.goto('http://localhost:3000/campaigns');
+
+  // Select campaign
+  await page.click('button[role="combobox"]');
+  await page.click(`text="${campaign.name}"`);
+
+  // Verify tabs are visible
+  await expect(page.locator('button:has-text("Tasks")')).toBeVisible();
+  await expect(page.locator('button:has-text("Overview")')).toBeVisible();
+
+  // Verify default tab is Tasks
+  await expect(page.locator('button[data-state="active"]:has-text("Tasks")')).toBeVisible();
+
+  // Verify Kanban board is visible
+  await expect(page.locator('text=/To Do/i')).toBeVisible();
+
+  // Switch to Overview tab
+  await page.click('button:has-text("Overview")');
+
+  // Wait for dashboard content
+  await page.waitForSelector('text=/Total Posts/i');
+
+  // Verify KPI cards
+  await expect(page.locator('text=/Total Posts/i')).toBeVisible();
+  await expect(page.locator('text=/Total Clicks/i')).toBeVisible();
+
+  // Verify chart
+  await expect(page.locator('text=/Engagement Over Time/i')).toBeVisible();
+
+  // Switch back to Tasks tab
+  await page.click('button:has-text("Tasks")');
+
+  // Verify Kanban board reappears
+  await expect(page.locator('text=/To Do/i')).toBeVisible();
+});
+
+test('should redirect from dashboard to campaigns', async ({ page }) => {
+  // Navigate to old dashboard URL
+  await page.goto('http://localhost:3000/dashboard');
+
+  // Wait for redirect
+  await page.waitForURL('http://localhost:3000/campaigns');
+
+  // Verify we're on campaigns page
+  await expect(page.locator('h1:has-text("Campaigns")')).toBeVisible();
+});
+
+test('should filter metrics by campaign', async ({ page }) => {
+  // Create two campaigns with different metrics
+  const campaign1 = await createTestCampaign({ name: 'Campaign 1' });
+  const campaign2 = await createTestCampaign({ name: 'Campaign 2' });
+
+  const task1 = await createTestTask({ campaignId: campaign1.id, status: 'posted' });
+  const task2 = await createTestTask({ campaignId: campaign2.id, status: 'posted' });
+
+  await fetch('http://localhost:3000/api/metrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ taskId: task1.id, type: 'click', value: 10 })
+  });
+
+  await fetch('http://localhost:3000/api/metrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ taskId: task2.id, type: 'click', value: 25 })
+  });
+
+  // Navigate to campaigns
+  await page.goto('http://localhost:3000/campaigns');
+
+  // Select Campaign 1
+  await page.click('button[role="combobox"]');
+  await page.click('text="Campaign 1"');
+
+  // Go to Overview tab
+  await page.click('button:has-text("Overview")');
+  await page.waitForSelector('text=/Total Clicks/i');
+
+  // Verify Campaign 1 metrics (10 clicks)
+  const clicks1 = await page.locator('.card:has-text("Total Clicks")').textContent();
+  expect(clicks1).toContain('10');
+
+  // Switch to Campaign 2
+  await page.click('button[role="combobox"]');
+  await page.click('text="Campaign 2"');
+
+  // Wait for stats refresh
+  await page.waitForTimeout(1000);
+
+  // Verify Campaign 2 metrics (25 clicks)
+  const clicks2 = await page.locator('.card:has-text("Total Clicks")').textContent();
+  expect(clicks2).toContain('25');
 });
 ```
 

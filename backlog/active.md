@@ -42,41 +42,40 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-## Active Improvements
+## Completed Improvements
 
-### 🚧 v0.7.0 - UX & Navigation Improvements (IN PLANNING)
+### ✅ v0.7.0 - Unified Campaign Manager (RELEASED 2025-11-13)
 
 **Theme:** Unified workflow and better navigation
 
-**Priority Items:**
+#### ✅ P0-1: Merge Dashboard into Campaigns Page
+**Status:** Complete (Released in v0.7.0)
+**Released:** 2025-11-13
+**Problem:** Dashboard and campaigns were separate, breaking the dual-purpose vision
+**Solution:** Added tabbed interface with Tasks and Overview tabs
 
-#### 🔴 P0-1: Merge Dashboard into Campaigns Page
-**Status:** Planned
-**Problem:** Dashboard and campaigns are separate, breaking the dual-purpose vision of a unified campaign manager
-**Goal:** Single page for planning, scheduling, AND monitoring
+**Implementation:**
+- ✅ Added Tabs component (Radix UI)
+- ✅ Created Tasks tab with Kanban board
+- ✅ Created Overview tab with dashboard stats and chart
+- ✅ Dashboard metrics automatically filter by selected campaign
+- ✅ Removed Dashboard link from header
+- ✅ `/dashboard` redirects to `/campaigns`
 
-**Implementation Plan:**
-- Add "Overview" and "Tasks" tabs/sections to campaigns page
-- Filter dashboard metrics by selected campaign
-- Show KPIs + engagement chart in Overview tab
-- Show Kanban board in Tasks tab
-- Remove separate `/dashboard` route
+**Results:**
+- All 75 tests passing
+- No regressions
+- Campaign-specific metrics working
+- Seamless tab switching
+- Aligns with original MLP vision
 
-**Files to Modify:**
-- `app/campaigns/page.tsx` - Add tabbed interface
-- `components/dashboard-stats.tsx` - Accept optional campaignId filter
-- `components/engagement-chart.tsx` - Accept optional campaignId filter
-- `app/dashboard/page.tsx` - Redirect to /campaigns
+**See:** `backlog/release-0.7.0.md` for full details
 
-**API Changes:**
-- Enhance `GET /api/metrics` and `GET /api/metrics/stats` with campaignId filtering (already supported)
+---
 
-**Tests:**
-- Update integration tests for filtered metrics
-- Add component tests for tabbed interface
+## Active Improvements
 
-**Estimated Effort:** 4-6 hours
-**Expected Release:** v0.7.0
+### 🚧 v0.7.x - Continued UX Improvements (IN PLANNING)
 
 ---
 

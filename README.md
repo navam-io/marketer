@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -157,6 +157,39 @@ Track your social media engagement with real-time metrics and beautiful visualiz
 - `GET /api/metrics` - Retrieve metrics with filtering
 - `POST /api/metrics` - Create new metrics
 - `GET /api/metrics/stats` - Aggregated statistics
+
+</details>
+
+<details open>
+<summary><b>🎯 Unified Campaign Manager</b> <code>v0.7.0</code></summary>
+
+<br>
+
+Manage campaigns, tasks, and performance metrics all in one place with seamless tab switching.
+
+**Tabbed Interface**
+- 📝 **Tasks Tab**: Complete Kanban board for task management
+- 📊 **Overview Tab**: Performance dashboard with campaign-specific metrics
+- 🔄 **Seamless Switching**: Instant tab navigation without page reloads
+- 🎯 **Filtered Metrics**: Automatically shows data for selected campaign only
+
+**Unified Workflow**
+- Single page for planning, scheduling, AND monitoring
+- No context switching between separate pages
+- Campaign-specific insights at a glance
+- Fulfills original MLP vision: dual-purpose campaign manager
+
+**User Benefits**
+- ✅ Better workflow - everything in one place
+- ✅ Campaign-focused metrics - no confusion
+- ✅ Faster navigation - one click to switch views
+- ✅ Cleaner interface - removed redundant links
+
+**Technical**
+- Dashboard automatically filters by selected campaign
+- `/dashboard` URL redirects to unified campaigns page
+- Built with Radix UI Tabs for accessibility
+- Real-time updates on tab switch
 
 </details>
 
@@ -409,13 +442,28 @@ marketer/
 - [x] **v0.4.3 & v0.4.4** — Campaign Task Count Refresh
 - [x] **v0.5.0** — Smooth Drag-and-Drop Animations
 - [x] **v0.6.0** — Performance Dashboard & Analytics
+- [x] **v0.7.0** — Unified Campaign Manager
 
 ### 📅 Planned
 
-- [ ] **v0.7.0** — Authentication (Optional)
-  - Passwordless login
-  - OAuth integration
-  - Multi-user support
+- [ ] **v0.7.x** — Source Management & Workflow Improvements
+  - Dedicated source management page
+  - Empty states and onboarding hints
+  - Manual metric recording UI
+
+- [ ] **v0.8.0** — Data Management
+  - Prisma migrations setup
+  - Campaign export/import
+
+- [ ] **v0.9.0** — Real Outcome Delivery
+  - LinkedIn API integration
+  - Twitter/X API integration
+  - Actual posting (vs. mocking)
+
+- [ ] **v1.0.0** — Agentic System
+  - LangGraph implementation
+  - Model routing (Haiku/Sonnet)
+  - Agent orchestration
 
 > 📖 See [`backlog/active.md`](backlog/active.md) for detailed specifications.
 

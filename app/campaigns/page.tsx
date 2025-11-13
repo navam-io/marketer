@@ -10,13 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KanbanBoard } from '@/components/kanban-board';
 import { CreateCampaignDialog } from '@/components/create-campaign-dialog';
 import { CreateTaskDialog } from '@/components/create-task-dialog';
 import { GenerateContentDialog } from '@/components/generate-content-dialog';
+import { DashboardStats } from '@/components/dashboard-stats';
+import { EngagementChart } from '@/components/engagement-chart';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3 } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Loader2, Sparkles, BarChart3, List } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -42,10 +44,25 @@ interface Task {
   updatedAt: Date;
 }
 
+interface Stats {
+  totalPosts: number;
+  totalClicks: number;
+  totalLikes: number;
+  totalShares: number;
+  engagementOverTime: Array<{
+    date: string;
+    clicks: number;
+    likes: number;
+    shares: number;
+  }>;
+}
+
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('tasks');
 
   const {
     selectedCampaignId,
@@ -88,11 +105,28 @@ export default function CampaignsPage() {
     }
   }, [selectedCampaignId]);
 
+  const fetchStats = useCallback(async () => {
+    if (!selectedCampaignId) {
+      setStats(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/metrics/stats?campaignId=${selectedCampaignId}`);
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      const data = await response.json();
+      setStats(data.stats || null);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      setStats(null);
+    }
+  }, [selectedCampaignId]);
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    await Promise.all([fetchCampaigns(), fetchTasks()]);
+    await Promise.all([fetchCampaigns(), fetchTasks(), fetchStats()]);
     setIsLoading(false);
-  }, [fetchCampaigns, fetchTasks]);
+  }, [fetchCampaigns, fetchTasks, fetchStats]);
 
   useEffect(() => {
     loadData();
@@ -105,11 +139,12 @@ export default function CampaignsPage() {
       if (selectedCampaignId) {
         fetchTasks();
         fetchCampaigns();
+        fetchStats();
       }
     }, 60000); // 60 seconds
 
     return () => clearInterval(pollInterval);
-  }, [selectedCampaignId, fetchTasks, fetchCampaigns]);
+  }, [selectedCampaignId, fetchTasks, fetchCampaigns, fetchStats]);
 
   const handleTaskUpdate = async (taskId: string, updates: Partial<Task>) => {
     try {
@@ -189,15 +224,9 @@ export default function CampaignsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Campaigns</h1>
-          <p className="text-slate-600 mt-1">Manage your marketing campaigns and tasks</p>
+          <p className="text-slate-600 mt-1">Manage your marketing campaigns, tasks, and performance</p>
         </div>
         <div className="flex gap-3">
-          <Link href="/dashboard">
-            <Button variant="outline">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-          </Link>
           <Button onClick={() => setIsCreateCampaignOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Campaign
@@ -243,15 +272,75 @@ export default function CampaignsPage() {
       )}
 
       {selectedCampaignId ? (
-        <KanbanBoard
-          tasks={tasks}
-          onTaskUpdate={handleTaskUpdate}
-          onTaskDelete={handleTaskDelete}
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="tasks">
+              <List className="h-4 w-4 mr-2" />
+              Tasks
+            </TabsTrigger>
+            <TabsTrigger value="overview">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Overview
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tasks" className="space-y-4 mt-6">
+            <KanbanBoard
+              tasks={tasks}
+              onTaskUpdate={handleTaskUpdate}
+              onTaskDelete={handleTaskDelete}
+            />
+          </TabsContent>
+
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {stats ? (
+              <>
+                <DashboardStats stats={stats} />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Engagement Over Time (Last 30 Days)</CardTitle>
+                    <CardDescription>
+                      Track clicks, likes, and shares for this campaign
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <EngagementChart data={stats.engagementOverTime} />
+                  </CardContent>
+                </Card>
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="pt-6">
+                    <h3 className="text-sm font-semibold text-blue-900 mb-2">
+                      💡 Track Link Clicks
+                    </h3>
+                    <p className="text-sm text-blue-800 mb-2">
+                      To track clicks on links in your posts, use the redirect tracker URL:
+                    </p>
+                    <code className="block p-3 bg-white border border-blue-200 rounded text-xs text-slate-800">
+                      {typeof window !== 'undefined' && `${window.location.origin}/r/{'{taskId}'}?url={'{destinationURL}'}`}
+                    </code>
+                    <p className="text-xs text-blue-700 mt-2">
+                      Replace <span className="font-mono bg-white px-1 rounded">{'taskId'}</span> with your task ID and
+                      <span className="font-mono bg-white px-1 rounded ml-1">{'destinationURL'}</span> with where you want users to go.
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <p className="text-slate-600 mb-2">No metrics data yet</p>
+                  <p className="text-sm text-slate-500">
+                    Metrics will appear here once your posts start getting engagement
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       ) : (
         <Card>
           <CardContent className="py-12 text-center text-slate-600">
-            Select a campaign to view tasks
+            Select a campaign to view tasks and metrics
           </CardContent>
         </Card>
       )}
