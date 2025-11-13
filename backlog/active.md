@@ -147,23 +147,24 @@ Automate content → promo generation → scheduling → simple analytics, using
 
 ## 4. Tech Stack Summary
 
-| Layer | Library / Tool | Purpose |
-|-------|----------------|----------|
-| **Frontend** | Next.js 15 (App Router) | UI + API routes |
-|  | Tailwind CSS + shadcn/ui + Radix | Design system |
-|  | dnd-kit | Drag-drop Kanban |
-|  | TanStack Query | Server state caching |
-|  | Zustand | Local UI state |
-|  | Recharts | Charts and KPIs |
-| **Backend** | Prisma + SQLite → Postgres (Neon) | Persistence |
-|  | Next.js API Routes | Business logic |
-|  | Node cron (setInterval) | Scheduling |
-| **AI/Agents** | Claude via AWS Bedrock or Anthropic SDK | Text generation |
-|  | LangGraph (JS) | Agent orchestration |
-| **Content Extraction** | jsdom + @mozilla/readability | HTML → markdown |
-| **Optional** | NextAuth | Auth |
-| **Infra** | Vercel / Localhost | Hosting |
-|  | Fly.io / Railway (if Python microservice) | Optional Claude agent |
+| Layer | Library / Tool | Status | Purpose |
+|-------|----------------|--------|----------|
+| **Frontend** | Next.js 15 (App Router) | ✅ v0.1.0 | UI + API routes |
+|  | Tailwind CSS + shadcn/ui + Radix | ✅ v0.1.0 | Design system |
+|  | dnd-kit | ✅ v0.2.0 | Drag-drop Kanban |
+|  | Zustand | ✅ v0.2.0 | Local UI state |
+|  | Recharts | ✅ v0.6.0 | Charts and KPIs |
+|  | TanStack Query | 📋 Planned | Server state caching (future optimization) |
+| **Backend** | Prisma + SQLite (dev) | ✅ v0.1.0 | Persistence (Postgres for prod) |
+|  | Next.js API Routes | ✅ v0.1.0 | Business logic |
+|  | Node setInterval (instrumentation.ts) | ✅ v0.4.0 | Background scheduling |
+| **AI/Agents** | Anthropic SDK (Claude Sonnet 4.5) | ✅ v0.3.0 | Content generation |
+|  | LangGraph (JS) | 📋 Planned | Agent orchestration (future) |
+| **Content Extraction** | jsdom + @mozilla/readability | ✅ v0.1.0 | HTML → markdown |
+| **Auth** | NextAuth | 📋 Planned | Optional (Slice 6) |
+| **Infra** | Localhost / Vercel | ✅ v0.1.0 | Development + deployment ready |
+
+**Legend:** ✅ Implemented | 📋 Planned | ❌ Not used
 
 ---
 
