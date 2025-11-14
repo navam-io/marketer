@@ -6,7 +6,7 @@
 
 *Transform your content into social promotions — no marketing team required.*
 
-[![Version](https://img.shields.io/badge/version-0.11.2-blue.svg)](https://github.com/yourusername/navam-marketer)
+[![Version](https://img.shields.io/badge/version-0.12.0-blue.svg)](https://github.com/yourusername/navam-marketer)
 [![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-Private-red.svg)](LICENSE)
@@ -366,6 +366,50 @@ Archive completed or inactive campaigns to keep your workspace organized while p
 
 </details>
 
+<details open>
+<summary><b>🗄️ Database Migrations</b> <code>v0.12.0</code></summary>
+
+<br>
+
+Production-ready database migration workflow using Prisma Migrate with version control and safe deployments.
+
+**Migration System**
+- 📜 **Version-Controlled Schema** — All migrations tracked in git
+- 🔒 **Safe Deployments** — Transactional migration application
+- ↩️ **Rollback Support** — Ability to revert schema changes
+- 👥 **Team Collaboration** — Shared schema history across developers
+- 🚀 **CI/CD Ready** — Automated deployment scripts
+
+**Development Workflow**
+```bash
+# Make schema changes in schema.prisma
+npm run db:migrate          # Creates migration + applies it
+npm run db:generate         # Regenerates Prisma Client (automatic)
+```
+
+**Production Deployment**
+```bash
+npm run db:migrate:deploy   # Applies pending migrations (CI/CD safe)
+```
+
+**Key Features**
+- Baseline migration (0_init) with complete schema
+- Migration lock file for consistency
+- No-prompt production deployment
+- Full schema history tracking
+- Support for SQLite (dev) and PostgreSQL (prod)
+
+**Benefits**
+- ✅ No more manual SQL scripts
+- ✅ Automatic schema synchronization
+- ✅ Conflict resolution via git
+- ✅ Audit trail in git history
+- ✅ Safe production deployments
+
+> 📖 Complete guide: [`docs/migrations.md`](docs/migrations.md)
+
+</details>
+
 ---
 
 ## 🚀 Quick Start
@@ -385,8 +429,8 @@ cd navam-marketer
 # Install dependencies
 npm install
 
-# Set up the database
-npm run db:push
+# Set up the database (run migrations)
+npm run db:migrate
 
 # Start the development server
 npm run dev
@@ -659,10 +703,22 @@ marketer/
 | `npm run build` | Build optimized production bundle |
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint for code quality |
-| `npm run db:push` | Push Prisma schema to database |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:migrate` | Create database migrations |
+| `npm test` | Run all tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Generate test coverage report |
+
+### Database Commands <code>v0.12.0</code>
+
+| Command | Description |
+|---------|-------------|
+| `npm run db:migrate` | Create & apply migration (development) |
+| `npm run db:migrate:deploy` | Apply migrations (production/CI) |
+| `npm run db:migrate:reset` | Reset database & reapply all migrations |
+| `npm run db:generate` | Regenerate Prisma client |
 | `npm run db:studio` | Open Prisma Studio GUI |
+| `npm run db:push` | Push schema (dev only, no migration files) |
+
+> 📖 For migration workflow details, see [`docs/migrations.md`](docs/migrations.md)
 
 ---
 

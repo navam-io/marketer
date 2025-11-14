@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.11.2
+**Current Version:** v0.12.0
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -381,15 +381,44 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
+### ✅ v0.12.0 - Prisma Migrations Setup (RELEASED 2025-11-13)
+
+**Theme:** Production-ready database migration workflow
+
+#### ✅ P1-6: Prisma Migrations Setup
+**Status:** Complete (Released in v0.12.0)
+**Released:** 2025-11-13
+**Problem:** Using `db:push` for development, no migration history
+**Solution:** Production-ready migration workflow with Prisma Migrate
+
+**Implementation:**
+- ✅ Created baseline migration (0_init) with full schema
+- ✅ Added migration lock file for consistency
+- ✅ Updated package.json scripts (db:migrate:deploy, db:migrate:reset)
+- ✅ Created comprehensive migration guide (docs/migrations.md)
+- ✅ Updated .gitignore to track migrations
+- ✅ All 241 tests passing
+
+**Results:**
+- Version-controlled database schema
+- Safe production deployments
+- Rollback capabilities
+- Team collaboration on schema changes
+- CI/CD integration ready
+
+**See:** `backlog/release-0.12.0.md` for full details
+
+---
+
 ## Active Improvements
 
-### 🟡 v0.11.x - Continued UX Improvements (IN PLANNING)
+### 🟡 v0.12.x - Continued Data Management (IN PLANNING)
 
 ---
 
 ## Backlog - Future Improvements
 
-### v0.11.x - UI & UX Refinements
+### v0.12.x - Data Management
 
 
 
@@ -411,29 +440,6 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 **Estimated Effort:** 3-4 hours
 **Expected Release:** v0.11.0
-
----
-
-### v0.12.0 - Data Management (Minor Release)
-
-#### 🟡 P1-6: Prisma Migrations Setup
-**Status:** Backlog
-**Problem:** Using `db:push` for development, no migration history
-**Goal:** Production-ready migration workflow
-
-**Features:**
-- Initialize Prisma migrations with full history
-- Migration files for all schema changes
-- Update README with migration instructions
-- Production deployment guide
-
-**Tasks:**
-- Run `npx prisma migrate dev --name init`
-- Update package.json scripts
-- Document migration workflow
-
-**Estimated Effort:** 2-3 hours
-**Expected Release:** v0.12.0
 
 ---
 
@@ -688,5 +694,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Current Status:** v0.11.2 released - Ready for v0.11.3 planning
-**Recent Momentum:** 13 releases in 2 weeks with 7 major improvements completed
+**Current Status:** v0.12.0 released - Ready for v0.12.1 planning
+**Recent Momentum:** 14 releases in 2 weeks with 8 major improvements completed
