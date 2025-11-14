@@ -20,7 +20,7 @@ import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -220,6 +220,70 @@ export default function CampaignsPage() {
     }
   };
 
+  const handleExport = async (campaignId: string) => {
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/export`);
+      if (!response.ok) throw new Error('Failed to export campaign');
+
+      // Get the filename from the Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+      const filename = filenameMatch ? filenameMatch[1] : `campaign-export-${Date.now()}.json`;
+
+      // Create a blob and download it
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      alert('Campaign exported successfully!');
+    } catch (error) {
+      console.error('Error exporting campaign:', error);
+      alert('Failed to export campaign');
+    }
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      const response = await fetch('/api/campaigns/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to import campaign');
+      }
+
+      alert(result.message || 'Campaign imported successfully!');
+
+      // Refresh campaigns and select the newly imported one
+      await fetchCampaigns();
+      if (result.campaign?.id) {
+        setSelectedCampaignId(result.campaign.id);
+      }
+    } catch (error) {
+      console.error('Error importing campaign:', error);
+      alert(error instanceof Error ? error.message : 'Failed to import campaign');
+    } finally {
+      // Reset the input so the same file can be imported again
+      event.target.value = '';
+    }
+  };
+
   const selectedCampaign = campaigns.find(c => c.id === selectedCampaignId);
 
   if (isLoading) {
@@ -262,6 +326,20 @@ export default function CampaignsPage() {
           <p className="text-slate-600 mt-1">Manage your marketing campaigns, tasks, and performance</p>
         </div>
         <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => document.getElementById('import-file-input')?.click()}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          <input
+            id="import-file-input"
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            className="hidden"
+          />
           <Button
             variant={showArchived ? "default" : "outline"}
             onClick={() => setShowArchived(!showArchived)}
@@ -315,6 +393,13 @@ export default function CampaignsPage() {
                 </Button>
               </>
             )}
+            <Button
+              variant="outline"
+              onClick={() => handleExport(selectedCampaignId)}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
             <Button
               variant="outline"
               onClick={() => handleArchiveToggle(selectedCampaignId, !selectedCampaign?.archived)}

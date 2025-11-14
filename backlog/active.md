@@ -1,7 +1,7 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.12.0
+**Current Version:** v0.12.1
 **Phase:** Improvement & Refinement (Post-MLP)
 **Last Updated:** 2025-11-13
 
@@ -410,6 +410,47 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
+### ✅ v0.12.1 - Data Export/Import (RELEASED 2025-11-13)
+
+**Theme:** Campaign backup and portability
+
+#### ✅ P2-7: Data Export/Import
+**Status:** Complete (Released in v0.12.1)
+**Released:** 2025-11-13
+**Problem:** No way to backup or transfer campaigns
+**Solution:** Export/import campaigns with all related data as JSON
+
+**Implementation:**
+- ✅ Created GET /api/campaigns/[id]/export endpoint
+- ✅ Created POST /api/campaigns/import endpoint
+- ✅ Added Export button on campaigns page
+- ✅ Added Import button on campaigns page
+- ✅ Export includes campaign, tasks, metrics, and source data
+- ✅ Import validates format, version, and duplicate names
+- ✅ Auto-select imported campaign after import
+- ✅ Comprehensive integration tests (13 new tests)
+
+**Files Created:**
+- `app/api/campaigns/[id]/export/route.ts` - Export endpoint
+- `app/api/campaigns/import/route.ts` - Import endpoint
+- `__tests__/integration/campaign-export-import.test.ts` - 13 tests
+
+**Files Modified:**
+- `app/campaigns/page.tsx` - Added export/import UI and handlers
+- `lib/test-utils.ts` - Enhanced test helpers
+- `package.json` - Version bump to 0.12.1
+
+**Results:**
+- All 254 tests passing (+13 new tests)
+- No regressions
+- Complete data portability
+- Safe backup and restore workflow
+- Campaign template sharing enabled
+
+**See:** `backlog/release-0.12.1.md` for full details
+
+---
+
 ## Active Improvements
 
 ### 🟡 v0.12.x - Continued Data Management (IN PLANNING)
@@ -443,25 +484,6 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-#### 🟢 P2-7: Data Export/Import
-**Status:** Backlog
-**Problem:** No way to backup or transfer campaigns
-**Goal:** Export/import campaigns with all related data
-
-**Features:**
-- Export campaign as JSON (includes tasks and metrics)
-- Import campaign from JSON file
-- Validation and error handling
-- Duplicate detection
-
-**API:**
-- `GET /api/campaigns/[id]/export`
-- `POST /api/campaigns/import`
-
-**Estimated Effort:** 4-5 hours
-**Expected Release:** v0.12.1
-
----
 
 ### v0.13.0 - Real Outcome Delivery (Minor Release)
 
@@ -694,5 +716,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Current Status:** v0.12.0 released - Ready for v0.12.1 planning
-**Recent Momentum:** 14 releases in 2 weeks with 8 major improvements completed
+**Current Status:** v0.12.1 released - Data Export/Import complete
+**Recent Momentum:** 15 releases in 2 weeks with 9 major improvements completed

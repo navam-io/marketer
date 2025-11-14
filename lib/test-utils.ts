@@ -38,12 +38,14 @@ export async function createTestCampaign(data?: Partial<{
   name: string;
   description: string;
   status: string;
+  sourceId: string;
 }>) {
   return await prismaTest.campaign.create({
     data: {
       name: data?.name || 'Test Campaign',
       description: data?.description || 'Test Description',
-      status: data?.status || 'active'
+      status: data?.status || 'active',
+      sourceId: data?.sourceId || null
     }
   });
 }
@@ -73,6 +75,9 @@ export async function createTestTask(
     platform: string;
     status: string;
     content: string;
+    scheduledAt: Date;
+    postedAt: Date;
+    outputJson: string;
   }>
 ) {
   // Support both old (string) and new (object) signature
@@ -86,7 +91,10 @@ export async function createTestTask(
       sourceId: data.sourceId || null,
       platform: data.platform || 'linkedin',
       status: data.status || 'todo',
-      content: data.content || 'Test task content'
+      content: data.content || 'Test task content',
+      scheduledAt: data.scheduledAt || null,
+      postedAt: data.postedAt || null,
+      outputJson: data.outputJson || null
     }
   });
 }
