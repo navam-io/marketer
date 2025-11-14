@@ -20,7 +20,7 @@ import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload, Copy } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -284,6 +284,26 @@ export default function CampaignsPage() {
     }
   };
 
+  const handleDuplicate = async (campaignId: string) => {
+    try {
+      const response = await fetch(`/api/campaigns/${campaignId}/duplicate`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) throw new Error('Failed to duplicate campaign');
+
+      const duplicatedCampaign = await response.json();
+      alert('Campaign duplicated successfully!');
+
+      // Refresh campaigns and select the newly duplicated one
+      await fetchCampaigns();
+      setSelectedCampaignId(duplicatedCampaign.id);
+    } catch (error) {
+      console.error('Error duplicating campaign:', error);
+      alert('Failed to duplicate campaign');
+    }
+  };
+
   const selectedCampaign = campaigns.find(c => c.id === selectedCampaignId);
 
   if (isLoading) {
@@ -393,6 +413,13 @@ export default function CampaignsPage() {
                 </Button>
               </>
             )}
+            <Button
+              variant="outline"
+              onClick={() => handleDuplicate(selectedCampaignId)}
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicate
+            </Button>
             <Button
               variant="outline"
               onClick={() => handleExport(selectedCampaignId)}
