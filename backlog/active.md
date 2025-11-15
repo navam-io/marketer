@@ -547,15 +547,48 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ## Active Improvements
 
-### 🟡 v0.13.x - Social Media Integration (IN PROGRESS)
+### 🟡 v1.0.0 - Manual Copy-Paste Workflow (COMPLETED 2025-11-15)
+
+**Theme:** Radical Simplification - Remove OAuth, Embrace Manual Workflow
+
+**Status:** ✅ RELEASED
+**Released:** 2025-11-15
+
+**Problem:** LinkedIn OAuth, auto-posting, and scheduler added too much complexity and violated local-first philosophy.
+
+**Solution:** Complete refactor to manual copy-paste workflow:
+- ✅ Copy button on all task cards
+- ✅ Manual post URL tracking
+- ✅ Removed User model and OAuth
+- ✅ Removed scheduler
+- ✅ Removed all `/api/auth` and `/api/scheduler` routes
+- ✅ 17 new integration tests (279 total, all passing)
+
+**Impact:**
+- Breaking changes (major version bump to v1.0.0)
+- Simpler, more reliable, truly local-first
+- Works with ANY social platform (not just LinkedIn)
+- Better privacy (no stored credentials)
+
+**See:** `backlog/release-1.0.0.md` for complete details
+**Issue:** #10 in `backlog/issues.md`
 
 ---
 
 ## Backlog - Future Improvements
 
-### v0.13.x - Real Outcome Delivery
+### v1.1.0 - Post Analytics Without OAuth
 
+#### 🟡 Issue #9: Post Analytics Without OAuth
+**Status:** Planned
+**Problem:** Need metrics tracking without OAuth
+**Goal:** CSV/JSON import + browser extension (optional)
 
+**See:** `backlog/issues.md` for detailed solution analysis
+
+---
+
+### v1.x.x - Enhanced Features
 
 #### ✅ P2-5: Enhanced Campaign Management
 **Status:** Complete (Released in v0.11.2, v0.12.2)
@@ -580,27 +613,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-
-#### 🟡 P2-9: Twitter/X API Integration
-**Status:** Backlog
-**Problem:** No actual posting to Twitter/X
-**Goal:** Real Twitter publishing via API v2
-
-**Features:**
-- Twitter OAuth 2.0 flow
-- POST to Twitter API
-- Handle character limits and media
-- Thread support for longer content
-- Store tweet URL
-
-**Similar to LinkedIn integration but with Twitter API**
-
-**Estimated Effort:** 6-8 hours
-**Expected Release:** v0.13.1
-
----
-
-### v1.0.0 - Agentic System (Major Release)
+### v2.0.0 - Agentic System (Future Major Release)
 
 #### 🟡 P1-10: LangGraph Agent Orchestration
 **Status:** Backlog
@@ -781,6 +794,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
-**Last Updated:** 2025-11-13
-**Current Status:** v0.13.0 released - LinkedIn API Integration complete (REAL POSTING!)
-**Recent Momentum:** 17 releases in 2 weeks with 11 major features completed
+**Last Updated:** 2025-11-15
+**Current Status:** v1.0.0 released - Manual Copy-Paste Workflow (MAJOR RELEASE - Breaking Changes)
+**Recent Momentum:** 18 releases total, major simplification in v1.0.0
+**Philosophy Shift:** Removed OAuth complexity, embraced local-first simplicity

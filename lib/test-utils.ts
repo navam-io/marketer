@@ -78,6 +78,7 @@ export async function createTestTask(
     scheduledAt: Date;
     postedAt: Date;
     outputJson: string;
+    publishedUrl: string;
   }>
 ) {
   // Support both old (string) and new (object) signature
@@ -94,7 +95,8 @@ export async function createTestTask(
       content: data.content || 'Test task content',
       scheduledAt: data.scheduledAt || null,
       postedAt: data.postedAt || null,
-      outputJson: data.outputJson || null
+      outputJson: data.outputJson || null,
+      publishedUrl: data.publishedUrl || null
     }
   });
 }

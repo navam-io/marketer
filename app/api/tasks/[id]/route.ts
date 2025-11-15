@@ -51,7 +51,8 @@ export async function PATCH(
       content,
       outputJson,
       scheduledAt,
-      postedAt
+      postedAt,
+      publishedUrl
     } = body;
 
     const updateData: any = {};
@@ -67,6 +68,9 @@ export async function PATCH(
     }
     if (postedAt !== undefined) {
       updateData.postedAt = postedAt ? new Date(postedAt) : null;
+    }
+    if (publishedUrl !== undefined) {
+      updateData.publishedUrl = publishedUrl || null;
     }
 
     const task = await prisma.task.update({

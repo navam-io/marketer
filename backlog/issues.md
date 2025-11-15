@@ -86,7 +86,161 @@
 
 ## Active
 
-No active issues at this time.
+[ ] **Issue #9 - Post Analytics Without OAuth** (Planned for v1.1.0)
+
+**Problem:** Now that we've removed LinkedIn OAuth and auto-posting (v1.0.0), we need a way to track post analytics (views, likes, shares, comments) without requiring OAuth authentication. Manual metrics entry works but is tedious for every post.
+
+**Requirements:**
+- Track post engagement metrics without OAuth authentication
+- Support multiple social platforms (LinkedIn, Twitter/X, etc.)
+- Minimize user effort - ideally automated or semi-automated
+- Respect privacy and API rate limits
+- Work with manually posted content (copy-paste workflow from v1.0.0)
+
+**Potential Solutions to Explore:**
+
+1. **Public API Scraping (No Auth)**
+   - Use public LinkedIn/Twitter profile APIs or RSS feeds
+   - Scrape publicly visible metrics from post URLs
+   - Pros: No OAuth needed, works for public posts
+   - Cons: Rate limits, may violate ToS, fragile to UI changes
+
+2. **Browser Extension Integration**
+   - Build optional Chrome/Firefox extension
+   - Extension reads metrics from social platform pages
+   - Sends data back to local Marketer app
+   - Pros: Accurate, platform-agnostic, no API limits
+   - Cons: Requires extension install, maintenance burden
+
+3. **Email/Notification Parsing**
+   - Parse engagement notification emails from LinkedIn/Twitter
+   - Extract metrics from email content
+   - Pros: Works without auth, automated
+   - Cons: Requires email integration, delayed metrics
+
+4. **Third-Party Analytics Services**
+   - Integrate with Buffer, Hootsuite, or similar analytics APIs
+   - These services track metrics separately
+   - Pros: Professional-grade analytics, maintained
+   - Cons: Additional service dependency, may require paid plans
+
+5. **Hybrid: Manual Entry + Import**
+   - Keep manual metrics entry (current v1.0.0 feature)
+   - Add CSV/JSON import for bulk metrics updates
+   - User exports from LinkedIn Analytics, imports to Marketer
+   - Pros: Simple, no ToS violations, user-controlled
+   - Cons: Still manual, requires export step
+
+**Recommended Approach:** Start with #5 (Hybrid) as v1.1.0, then explore #2 (Browser Extension) for v1.2.0 if demand exists.
+
+---
+
+---
+
+## Completed
+
+[x] **Issue #10 - Simplify to Manual Copy-Paste Workflow** (Resolved in v1.0.0)
+
+**Problem:** LinkedIn OAuth, token management, and auto-posting added significant complexity and made the app dependent on external APIs. This violated the local-first, simple MLP philosophy. Users had to:
+- Configure OAuth credentials
+- Maintain refresh tokens
+- Deal with token expiry errors
+- Trust the app with social media access
+- Run a scheduler process
+
+This created friction and dependency that made Marketer less friendly for local, self-hosted use.
+
+**Solution:** Completely refactored to a simple copy-paste workflow:
+- **Copy Button**: One-click copy of post content to clipboard
+- **Manual Posting**: User pastes to social platform (LinkedIn, Twitter, etc.)
+- **Post URL Tracking**: Optional field to associate published post URL for reference
+- **No Auth Required**: Zero OAuth, zero external dependencies
+- **True Local-First**: Works completely offline except for content generation
+
+**Implementation:**
+- Added `Copy` button to all task cards with toast notification
+- Added `publishedUrl` field to Task model (optional)
+- Added URL input UI on posted task cards
+- Removed entire `User` model (no more OAuth token storage)
+- Removed all LinkedIn OAuth routes (`/api/auth/*`)
+- Removed scheduler routes (`/api/scheduler/*`)
+- Removed `lib/linkedin.ts` integration
+- Removed `LinkedInSettingsDialog` component
+- Removed `publishError` field (no auto-posting = no posting errors)
+- Updated Task API to support `publishedUrl` field
+- Removed 43 LinkedIn/OAuth-related tests
+- Added 17 comprehensive tests for manual posting workflow (279 tests total)
+- Updated database schema with migration
+
+**User Impact:**
+- **Simpler Onboarding**: No OAuth setup required
+- **Better Privacy**: No social media credentials stored
+- **Local-First**: Works completely offline
+- **Platform Agnostic**: Copy-paste works for ANY social platform
+- **Faster Posts**: No waiting for OAuth or scheduler
+- **More Control**: User reviews post on platform before publishing
+- **No Breaking**: If platform API changes, workflow still works
+
+**Breaking Changes (v1.0.0):**
+- LinkedIn OAuth removed - users can no longer auto-post
+- Scheduler removed - no automatic posting at scheduled times
+- User model removed - existing OAuth tokens will be lost
+- `publishError` field removed from Task model
+- `scheduledAt` still exists but no longer triggers auto-posting
+
+**Migration Path:**
+- v0.14.x users will need to manually post scheduled tasks
+- Published URLs can be added retroactively to existing posted tasks
+- Export campaigns before upgrading to preserve data
+
+**Trade-offs:**
+- Lost: Automated posting, schedule-and-forget convenience
+- Gained: Simplicity, privacy, reliability, platform flexibility
+
+**See:** `backlog/release-1.0.0.md` for detailed release notes
+
+---
+
+[x] **Issue #8 - LinkedIn Token Auto-Refresh** (Resolved in v0.14.1)
+
+**Problem:** LinkedIn access tokens expire after 60 days, causing scheduled posting to fail with "Invalid access token" error (status 401, serviceErrorCode 65600). Users had to manually reconnect LinkedIn every 60 days.
+
+**Error Log:**
+```
+[Scheduler] LinkedIn posting failed for task: LinkedIn posting failed: Invalid access token
+LinkedIn API error: {
+  message: 'Invalid access token',
+  status: 401,
+  serviceErrorCode: 65600
+}
+```
+
+**Solution:** Implemented automatic token refresh mechanism:
+- **OAuth Scopes:** Added `openid profile email` scopes to obtain refresh tokens
+- **Token Storage:** Store refresh tokens in database during OAuth callback
+- **Auto-Refresh:** Detect token expiry (5-minute buffer) and refresh automatically
+- **Transparent UX:** Users never need to manually reconnect for token expiry
+- **Credential Priority:** Uses database-stored OAuth credentials (v0.14.0 feature) or env vars
+
+**Implementation:**
+- Modified `app/api/auth/linkedin/route.ts` to request refresh token scopes
+- Modified `app/api/auth/linkedin/callback/route.ts` to store refresh tokens
+- Created `refreshLinkedInToken()` function in `lib/linkedin.ts`
+- Enhanced `getLinkedInAccessToken()` to auto-refresh before expiry
+- Added 14 integration tests in `__tests__/integration/linkedin-token-refresh.test.ts`
+- Fixed `cleanDatabase()` in test utilities to include User cleanup
+
+**User Impact:**
+- No more "Invalid access token" errors after 60 days
+- Tokens refresh automatically before posting
+- One-time reconnection required for existing users to obtain refresh token
+- New users get automatic refresh immediately
+
+**Test Coverage:** 14 new tests covering expiry detection, refresh logic, credential priority, error scenarios, and update behavior. All 296 tests passing.
+
+**See:** `backlog/release-0.14.1.md` for detailed release notes
+
+---
 
 ---
 
@@ -159,3 +313,4 @@ No active issues at this time.
 - Better onboarding experience for new users
 
 **See:** `backlog/release-0.13.1.md` for detailed release notes
+

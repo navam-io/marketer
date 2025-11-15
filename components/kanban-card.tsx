@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, Check, X, Calendar, BarChart3, Heart, Share2, MessageCircle, TrendingUp } from 'lucide-react';
+import { Pencil, Trash2, Check, X, Calendar, BarChart3, Heart, Share2, MessageCircle, TrendingUp, Copy, Link2, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScheduleTaskDialog } from '@/components/schedule-task-dialog';
 import { RecordMetricsDialog } from '@/components/record-metrics-dialog';
+import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
 
 interface Task {
   id: string;
@@ -22,6 +24,7 @@ interface Task {
   outputJson?: string;
   scheduledAt?: Date;
   postedAt?: Date;
+  publishedUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +54,8 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
   const [editContent, setEditContent] = useState(task.content || '');
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [isRecordMetricsOpen, setIsRecordMetricsOpen] = useState(false);
+  const [isAddingUrl, setIsAddingUrl] = useState(false);
+  const [urlInput, setUrlInput] = useState(task.publishedUrl || '');
   const [metrics, setMetrics] = useState<Metric[]>([]);
 
   const {
@@ -131,6 +136,29 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
     fetchMetrics(); // Refresh metrics after recording
   };
 
+  const handleCopyContent = async () => {
+    if (!task.content) return;
+
+    try {
+      await navigator.clipboard.writeText(task.content);
+      toast.success('Post content copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error('Failed to copy content');
+    }
+  };
+
+  const handleSaveUrl = async () => {
+    await onUpdate(task.id, { publishedUrl: urlInput || undefined });
+    setIsAddingUrl(false);
+    toast.success('Post URL saved!');
+  };
+
+  const handleCancelUrl = () => {
+    setUrlInput(task.publishedUrl || '');
+    setIsAddingUrl(false);
+  };
+
   const getMetricIcon = (type: string) => {
     switch (type) {
       case 'like': return <Heart className="h-3 w-3" />;
@@ -177,34 +205,50 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
               )}
             </div>
             <div className="flex gap-1">
-              {!isEditing && (
+              {!isEditing && !isAddingUrl && (
                 <>
-                  {task.status === 'posted' && (
+                  {task.content && (
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-7 w-7 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsRecordMetricsOpen(true);
+                        handleCopyContent();
                       }}
-                      title="Record metrics"
+                      title="Copy content to clipboard"
                     >
-                      <BarChart3 className="h-3 w-3" />
+                      <Copy className="h-3 w-3" />
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsScheduleDialogOpen(true);
-                    }}
-                    title="Schedule task"
-                  >
-                    <Calendar className="h-3 w-3" />
-                  </Button>
+                  {task.status === 'posted' && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsAddingUrl(true);
+                        }}
+                        title="Add post URL"
+                      >
+                        <Link2 className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsRecordMetricsOpen(true);
+                        }}
+                        title="Record metrics"
+                      >
+                        <BarChart3 className="h-3 w-3" />
+                      </Button>
+                    </>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -233,7 +277,42 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
           </div>
         </CardHeader>
         <CardContent className="p-3 pt-0">
-          {isEditing ? (
+          {isAddingUrl ? (
+            <div className="space-y-2">
+              <Input
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://linkedin.com/posts/..."
+                className="text-sm"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSaveUrl();
+                  }}
+                  className="flex-1"
+                >
+                  <Check className="h-3 w-3 mr-1" />
+                  Save URL
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCancelUrl();
+                  }}
+                  className="flex-1"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : isEditing ? (
             <div className="space-y-2">
               <Textarea
                 value={editContent}
@@ -276,6 +355,20 @@ export function KanbanCard({ task, onUpdate, onDelete, isDragging = false }: Kan
                 <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
                   <Calendar className="h-3 w-3" />
                   {new Date(task.scheduledAt).toLocaleDateString()}
+                </div>
+              )}
+              {task.publishedUrl && (
+                <div className="flex items-center gap-1 mt-2 text-xs">
+                  <a
+                    href={task.publishedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline flex items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    View Post
+                  </a>
                 </div>
               )}
               {task.status === 'posted' && metrics.length > 0 && (
