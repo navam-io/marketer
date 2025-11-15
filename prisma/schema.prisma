@@ -60,6 +60,10 @@ model Task {
   scheduledAt DateTime?
   postedAt    DateTime?
 
+  // Publishing fields (v0.13.0)
+  publishedUrl String?  // Actual URL of published post (LinkedIn, Twitter, etc.)
+  publishError String?  // Error message if publishing failed
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -79,4 +83,26 @@ model Metric {
   createdAt   DateTime @default(now())
 
   @@index([taskId])
+}
+
+// User model - for v0.13.0 (Single-user token storage)
+// This is a simple single-row table for storing OAuth tokens
+// No multi-user auth - just stores tokens for LinkedIn/Twitter APIs
+model User {
+  id                    String    @id @default(cuid())
+
+  // LinkedIn OAuth tokens
+  linkedinAccessToken   String?
+  linkedinRefreshToken  String?
+  linkedinTokenExpiry   DateTime?
+  linkedinUserId        String?   // LinkedIn user ID (sub from token)
+
+  // Twitter OAuth tokens (for future v0.13.1)
+  twitterAccessToken    String?
+  twitterRefreshToken   String?
+  twitterTokenExpiry    DateTime?
+  twitterUserId         String?   // Twitter user ID
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }

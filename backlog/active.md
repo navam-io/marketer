@@ -1,8 +1,8 @@
 # Active Backlog - Improvement Phase
 
 **Product:** Navam Marketer
-**Current Version:** v0.12.2
-**Phase:** Improvement & Refinement (Post-MLP)
+**Current Version:** v0.13.0
+**Phase:** Real Outcome Delivery
 **Last Updated:** 2025-11-13
 
 ---
@@ -19,10 +19,11 @@ The initial MLP build phase (v0.1.0 - v0.6.0) is complete! All 5 core feature sl
 - ✅ Slice 5: Performance Dashboard (v0.6.0)
 
 **Achievement Highlights:**
-- 🚀 16 releases in rapid iteration (v0.1.0 → v0.12.2, all in 2 weeks!)
-- 🧪 Comprehensive test coverage: 266 tests, 100% pass rate, <3s execution
-- 📦 Full tech stack: Next.js 15, Prisma, Claude AI, dnd-kit, Recharts, Sonner
+- 🚀 17 releases in rapid iteration (v0.1.0 → v0.13.0, all in 2 weeks!)
+- 🧪 Comprehensive test coverage: 266 tests, 100% pass rate, <3.2s execution
+- 📦 Full tech stack: Next.js 15, Prisma, Claude AI, LinkedIn API, dnd-kit, Recharts, Sonner
 - 📚 Complete documentation with detailed release notes for every version
+- ✨ **Real LinkedIn posting** - First actual social media integration!
 - ✨ 5 major issues resolved (unified navigation, streamlined workflows, toast notifications)
 
 **Archive Note:** The original slice-based planning document has been preserved in `backlog/archive/active-slices-v0.1-v0.6.md` for historical reference.
@@ -491,15 +492,68 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 
 ---
 
+### ✅ v0.13.0 - LinkedIn API Integration (RELEASED 2025-11-13)
+
+**Theme:** Real outcome delivery - Actual LinkedIn posting
+
+#### ✅ P1-8: LinkedIn API Integration
+**Status:** Complete (Released in v0.13.0)
+**Released:** 2025-11-13
+**Problem:** "Posted" status was mock, not actually posting to LinkedIn
+**Solution:** LinkedIn OAuth + real API posting with simple single-user token storage
+
+**Implementation:**
+- ✅ Created User model for single-user OAuth token storage
+- ✅ LinkedIn OAuth 2.0 flow (initiate + callback routes)
+- ✅ GET /api/auth/linkedin - Initiate OAuth
+- ✅ GET /api/auth/linkedin/callback - Handle OAuth callback
+- ✅ GET /api/auth/status - Check connection status
+- ✅ lib/linkedin.ts - LinkedIn UGC Posts API integration
+- ✅ Scheduler integration - Actually posts to LinkedIn when tasks are due
+- ✅ Task model updates - publishedUrl and publishError fields
+- ✅ LinkedIn connection UI - Status banner and connect button
+- ✅ Environment variable documentation (.env.example)
+
+**Design Decision:**
+- Simple single-user token storage (MLP approach)
+- No multi-user auth (deferred to v2.0.0)
+- Local-first compatible (SQLite)
+- Perfect for target user (bootstrapped founder)
+
+**Files Created:**
+- `app/api/auth/linkedin/route.ts` - OAuth initiate
+- `app/api/auth/linkedin/callback/route.ts` - OAuth callback
+- `app/api/auth/status/route.ts` - Connection status
+- `lib/linkedin.ts` - LinkedIn API integration
+- `.env.example` - Environment variable docs
+
+**Files Modified:**
+- `prisma/schema.prisma` - Added User model, Task publishing fields
+- `app/api/scheduler/process/route.ts` - LinkedIn posting integration
+- `app/campaigns/page.tsx` - LinkedIn connection status UI
+- `package.json` - Version bump to 0.13.0
+
+**Results:**
+- All 266 tests passing (no regressions)
+- Real LinkedIn posting works
+- OAuth flow functional
+- Published URLs stored and displayed
+- Error handling for failed posts
+- Connection status indicator
+
+**See:** `backlog/release-0.13.0.md` for full details
+
+---
+
 ## Active Improvements
 
-### 🟡 v0.12.x - Continued Data Management (IN PLANNING)
+### 🟡 v0.13.x - Social Media Integration (IN PROGRESS)
 
 ---
 
 ## Backlog - Future Improvements
 
-### v0.12.x - Data Management
+### v0.13.x - Real Outcome Delivery
 
 
 
@@ -527,37 +581,7 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 
-### v0.13.0 - Real Outcome Delivery (Minor Release)
-
-#### 🟡 P1-8: LinkedIn API Integration
-**Status:** Backlog
-**Problem:** "Posted" status is mock, not actually posting to LinkedIn
-**Goal:** Real LinkedIn publishing via API
-
-**Features:**
-- LinkedIn OAuth flow for authentication
-- Store access tokens securely
-- POST to LinkedIn API when task is scheduled
-- Handle API errors and rate limits
-- Store published post URL
-- Show actual LinkedIn link on task card
-
-**Dependencies:**
-- User authentication (Slice 6 or simple token storage)
-- LinkedIn Developer App credentials
-
-**Schema Changes:**
-- Add `User` table (if not exists)
-- Add `User.linkedinAccessToken: String?`
-- Add `Task.publishedUrl: String?`
-- Add `Task.publishError: String?`
-
-**Estimated Effort:** 8-10 hours
-**Expected Release:** v0.13.0
-
----
-
-#### 🟢 P2-9: Twitter/X API Integration
+#### 🟡 P2-9: Twitter/X API Integration
 **Status:** Backlog
 **Problem:** No actual posting to Twitter/X
 **Goal:** Real Twitter publishing via API v2
@@ -758,5 +782,5 @@ Based on user feedback (`backlog/feedback.md`) and test coverage analysis (`docs
 ---
 
 **Last Updated:** 2025-11-13
-**Current Status:** v0.12.2 released - Campaign Duplication complete
-**Recent Momentum:** 16 releases in 2 weeks with 10 major improvements completed
+**Current Status:** v0.13.0 released - LinkedIn API Integration complete (REAL POSTING!)
+**Recent Momentum:** 17 releases in 2 weeks with 11 major features completed

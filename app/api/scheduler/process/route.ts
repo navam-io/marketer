@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { postToLinkedIn } from '@/lib/linkedin';
 
 /**
  * POST /api/scheduler/process
@@ -7,7 +8,10 @@ import { prisma } from '@/lib/prisma';
  *
  * This endpoint is called by the background scheduler service
  * to check for tasks with scheduledAt <= now and status = 'scheduled'
- * and automatically move them to 'posted' status
+ * and automatically post them to the configured platforms.
+ *
+ * For LinkedIn tasks, it will actually post to LinkedIn API.
+ * For other platforms, it will just mark as posted (mock for now).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -25,27 +29,73 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Scheduler] Found ${dueTasks.length} tasks due for posting`);
 
-    // Update each task to 'posted' status
+    // Process each task
     const results = await Promise.all(
       dueTasks.map(async (task) => {
         try {
+          let publishedUrl: string | undefined;
+          let publishError: string | undefined;
+
+          // Actually post to LinkedIn if platform is 'linkedin'
+          if (task.platform?.toLowerCase() === 'linkedin' && task.content) {
+            try {
+              console.log(`[Scheduler] Posting task ${task.id} to LinkedIn...`);
+              const result = await postToLinkedIn(task.content);
+              publishedUrl = result.url;
+              console.log(`[Scheduler] Successfully posted to LinkedIn: ${publishedUrl}`);
+            } catch (error) {
+              publishError = error instanceof Error ? error.message : 'Failed to post to LinkedIn';
+              console.error(`[Scheduler] LinkedIn posting failed for task ${task.id}:`, publishError);
+            }
+          } else if (task.platform) {
+            // For other platforms (Twitter, etc.), just mark as posted for now
+            console.log(`[Scheduler] Platform '${task.platform}' not yet implemented, marking as posted`);
+          }
+
+          // Update task status
           const updated = await prisma.task.update({
             where: { id: task.id },
             data: {
-              status: 'posted',
-              postedAt: now
+              status: publishError ? 'scheduled' : 'posted', // Keep as scheduled if posting failed
+              postedAt: publishError ? null : now,
+              publishedUrl: publishedUrl || null,
+              publishError: publishError || null
             }
           });
+
+          if (publishError) {
+            console.error(`[Scheduler] Task ${task.id} posting failed: ${publishError}`);
+            return {
+              success: false,
+              taskId: task.id,
+              platform: task.platform,
+              error: publishError
+            };
+          }
 
           console.log(`[Scheduler] Posted task ${task.id} (${task.platform || 'unknown'})`);
 
           return {
             success: true,
             taskId: task.id,
-            platform: task.platform
+            platform: task.platform,
+            publishedUrl
           };
         } catch (error) {
-          console.error(`[Scheduler] Error posting task ${task.id}:`, error);
+          console.error(`[Scheduler] Error processing task ${task.id}:`, error);
+
+          // Try to update task with error
+          try {
+            await prisma.task.update({
+              where: { id: task.id },
+              data: {
+                publishError: error instanceof Error ? error.message : 'Unknown error'
+              }
+            });
+          } catch (updateError) {
+            console.error(`[Scheduler] Failed to update task error:`, updateError);
+          }
+
           return {
             success: false,
             taskId: task.id,

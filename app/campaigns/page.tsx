@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -20,7 +22,7 @@ import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { OnboardingHint } from '@/components/onboarding-hint';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload, Copy } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload, Copy, Check, X } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -67,10 +69,27 @@ interface Stats {
   }>;
 }
 
+interface AuthStatus {
+  linkedin: {
+    connected: boolean;
+    configured: boolean;
+    userId?: string | null;
+    expiresAt?: string | null;
+  };
+  twitter: {
+    connected: boolean;
+    configured: boolean;
+    userId?: string | null;
+    expiresAt?: string | null;
+  };
+}
+
 export default function CampaignsPage() {
+  const searchParams = useSearchParams();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('tasks');
   const [showArchived, setShowArchived] = useState(false);
@@ -83,6 +102,26 @@ export default function CampaignsPage() {
     isGenerateContentOpen,
     setIsGenerateContentOpen
   } = useAppStore();
+
+  // Handle URL parameters (errors and success messages from OAuth flow)
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const linkedinStatus = searchParams.get('linkedin');
+
+    if (error) {
+      toast.error(decodeURIComponent(error));
+      // Clear the error from URL
+      window.history.replaceState({}, '', '/campaigns');
+    }
+
+    if (linkedinStatus === 'connected') {
+      toast.success('LinkedIn connected successfully!');
+      // Clear the success message from URL
+      window.history.replaceState({}, '', '/campaigns');
+      // Refresh auth status to reflect the connection
+      fetchAuthStatus();
+    }
+  }, [searchParams]);
 
   const fetchCampaigns = useCallback(async () => {
     try {
@@ -134,11 +173,23 @@ export default function CampaignsPage() {
     }
   }, [selectedCampaignId]);
 
+  const fetchAuthStatus = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/status');
+      if (!response.ok) throw new Error('Failed to fetch auth status');
+      const data = await response.json();
+      setAuthStatus(data);
+    } catch (error) {
+      console.error('Error fetching auth status:', error);
+      setAuthStatus(null);
+    }
+  }, []);
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    await Promise.all([fetchCampaigns(), fetchTasks(), fetchStats()]);
+    await Promise.all([fetchCampaigns(), fetchTasks(), fetchStats(), fetchAuthStatus()]);
     setIsLoading(false);
-  }, [fetchCampaigns, fetchTasks, fetchStats]);
+  }, [fetchCampaigns, fetchTasks, fetchStats, fetchAuthStatus]);
 
   useEffect(() => {
     loadData();
@@ -373,6 +424,94 @@ export default function CampaignsPage() {
           </Button>
         </div>
       </div>
+
+      {/* LinkedIn Connection Status */}
+      {authStatus && (
+        <Card className={
+          authStatus.linkedin.connected
+            ? 'border-green-200 bg-green-50'
+            : !authStatus.linkedin.configured
+            ? 'border-slate-200 bg-slate-50'
+            : 'border-amber-200 bg-amber-50'
+        }>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {authStatus.linkedin.connected ? (
+                  <>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+                      <Check className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-green-900">LinkedIn Connected</p>
+                      <p className="text-sm text-green-700">
+                        Ready to post to LinkedIn automatically when tasks are scheduled
+                      </p>
+                    </div>
+                  </>
+                ) : !authStatus.linkedin.configured ? (
+                  <>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+                      <X className="h-5 w-5 text-slate-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">LinkedIn Not Configured</p>
+                      <p className="text-sm text-slate-700">
+                        Set up LinkedIn OAuth credentials in environment variables to enable automatic posting
+                      </p>
+                      <p className="text-xs text-slate-600 mt-1">
+                        See .env.example for required variables: LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, LINKEDIN_REDIRECT_URI
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+                      <X className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-amber-900">LinkedIn Not Connected</p>
+                      <p className="text-sm text-amber-700">
+                        Connect LinkedIn to automatically post scheduled tasks
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div>
+                {authStatus.linkedin.connected ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-green-300 hover:bg-green-100"
+                    onClick={() => fetchAuthStatus()}
+                  >
+                    Refresh Status
+                  </Button>
+                ) : authStatus.linkedin.configured ? (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => window.location.href = '/api/auth/linkedin'}
+                  >
+                    Connect LinkedIn
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled
+                    className="cursor-not-allowed"
+                  >
+                    Setup Required
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {!selectedCampaignId && campaigns.length > 0 && (
         <OnboardingHint

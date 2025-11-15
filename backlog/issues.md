@@ -87,3 +87,38 @@
 ## Active
 
 No active issues at this time.
+
+---
+
+[x] **Issue #6 - LinkedIn OAuth Configuration Error** (Resolved in v0.13.1)
+
+**Problem:** When clicking "Connect LinkedIn" button without having LinkedIn OAuth credentials configured, users received a raw JSON error response instead of a user-friendly message. The error appeared as: `{"error":"LinkedIn OAuth not configured","message":"Please set LINKEDIN_CLIENT_ID and LINKEDIN_REDIRECT_URI environment variables"}`
+
+**Issues:**
+- Poor UX: JSON error displayed on white page instead of graceful error handling
+- No distinction between "not configured" vs "not connected" states
+- No guidance for users on how to set up LinkedIn OAuth
+- Button appeared clickable even when OAuth wasn't configured
+
+**Solution:** Implemented comprehensive OAuth configuration handling:
+- **Auth Status API**: Added `configured: boolean` field to `/api/auth/status` response
+- **Error Handling**: LinkedIn OAuth route now redirects with error message instead of returning JSON
+- **UI States**: Three distinct visual states (Connected, Not Connected, Not Configured)
+- **Toast Notifications**: User-friendly error and success messages using Sonner
+- **Disabled Button**: "Setup Required" button disabled when OAuth not configured
+- **Guidance**: Card shows instructions to check `.env.example` for required variables
+
+**Implementation:**
+- Modified `app/api/auth/status/route.ts` to detect OAuth configuration
+- Updated `app/api/auth/linkedin/route.ts` to redirect with errors instead of JSON
+- Enhanced `app/campaigns/page.tsx` with three-state UI and toast notifications
+- Added comprehensive test coverage (7 new tests in `linkedin-oauth.test.ts`)
+- All 273 tests passing with zero regressions
+
+**User Impact:**
+- Clear visual indication of LinkedIn integration status
+- Helpful guidance when OAuth credentials need to be set up
+- No more confusing JSON error pages
+- Better onboarding experience for new users
+
+**See:** `backlog/release-0.13.1.md` for detailed release notes
