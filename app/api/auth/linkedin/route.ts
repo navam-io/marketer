@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 /**
  * LinkedIn OAuth 2.0 - Initiate Authorization
@@ -16,15 +17,30 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   try {
-    const clientId = process.env.LINKEDIN_CLIENT_ID;
-    const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-    const redirectUri = process.env.LINKEDIN_REDIRECT_URI;
+    // Priority: User's database credentials > Environment variables (fallback)
+    const user = await prisma.user.findFirst();
+
+    let clientId: string | undefined;
+    let clientSecret: string | undefined;
+    let redirectUri: string | undefined;
+
+    if (user?.linkedinClientId && user?.linkedinClientSecret && user?.linkedinRedirectUri) {
+      // Use user's configured credentials from database
+      clientId = user.linkedinClientId;
+      clientSecret = user.linkedinClientSecret;
+      redirectUri = user.linkedinRedirectUri;
+    } else {
+      // Fallback to environment variables (legacy support)
+      clientId = process.env.LINKEDIN_CLIENT_ID;
+      clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
+      redirectUri = process.env.LINKEDIN_REDIRECT_URI;
+    }
 
     // Check if LinkedIn OAuth is configured
     if (!clientId || !clientSecret || !redirectUri) {
       // Redirect back to campaigns page with error message instead of JSON response
       const errorMessage = encodeURIComponent(
-        'LinkedIn OAuth is not configured. Please set LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, and LINKEDIN_REDIRECT_URI environment variables.'
+        'LinkedIn OAuth is not configured. Please configure your LinkedIn app credentials in Settings.'
       );
       return NextResponse.redirect(
         new URL(`/campaigns?error=${errorMessage}`, request.url)

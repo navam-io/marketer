@@ -21,8 +21,9 @@ import { GenerateContentDialog } from '@/components/generate-content-dialog';
 import { DashboardStats } from '@/components/dashboard-stats';
 import { EngagementChart } from '@/components/engagement-chart';
 import { OnboardingHint } from '@/components/onboarding-hint';
+import { LinkedInSettingsDialog } from '@/components/linkedin-settings-dialog';
 import { useAppStore } from '@/lib/store';
-import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload, Copy, Check, X } from 'lucide-react';
+import { Plus, Loader2, Sparkles, BarChart3, List, FileText, Archive, ArchiveRestore, Download, Upload, Copy, Check, X, Settings } from 'lucide-react';
 
 interface Campaign {
   id: string;
@@ -93,6 +94,7 @@ function CampaignsPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('tasks');
   const [showArchived, setShowArchived] = useState(false);
+  const [isLinkedInSettingsOpen, setIsLinkedInSettingsOpen] = useState(false);
 
   const {
     selectedCampaignId,
@@ -457,10 +459,10 @@ function CampaignsPageContent() {
                     <div>
                       <p className="font-semibold text-slate-900">LinkedIn Not Configured</p>
                       <p className="text-sm text-slate-700">
-                        Set up LinkedIn OAuth credentials in environment variables to enable automatic posting
+                        Configure your LinkedIn app credentials to enable automatic posting
                       </p>
                       <p className="text-xs text-slate-600 mt-1">
-                        See .env.example for required variables: LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, LINKEDIN_REDIRECT_URI
+                        Click "Configure LinkedIn" to set up your own LinkedIn app credentials
                       </p>
                     </div>
                   </>
@@ -499,12 +501,13 @@ function CampaignsPageContent() {
                   </Button>
                 ) : (
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
-                    disabled
-                    className="cursor-not-allowed"
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setIsLinkedInSettingsOpen(true)}
                   >
-                    Setup Required
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configure LinkedIn
                   </Button>
                 )}
               </div>
@@ -771,6 +774,11 @@ function CampaignsPageContent() {
       )}
 
       <CreateCampaignDialog onCampaignCreated={loadData} />
+      <LinkedInSettingsDialog
+        open={isLinkedInSettingsOpen}
+        onOpenChange={setIsLinkedInSettingsOpen}
+        onSettingsSaved={fetchAuthStatus}
+      />
       {selectedCampaignId && (
         <>
           <CreateTaskDialog

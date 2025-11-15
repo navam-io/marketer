@@ -91,13 +91,19 @@ model Metric {
 model User {
   id                    String    @id @default(cuid())
 
+  // LinkedIn OAuth App Credentials (user-owned, v0.13.2+)
+  // Each user configures their own LinkedIn app instead of using shared credentials
+  linkedinClientId      String?   // User's LinkedIn app client ID
+  linkedinClientSecret  String?   // User's LinkedIn app client secret (encrypted)
+  linkedinRedirectUri   String?   // User's configured redirect URI
+
   // LinkedIn OAuth tokens
   linkedinAccessToken   String?
   linkedinRefreshToken  String?
   linkedinTokenExpiry   DateTime?
   linkedinUserId        String?   // LinkedIn user ID (sub from token)
 
-  // Twitter OAuth tokens (for future v0.13.1)
+  // Twitter OAuth tokens (for future)
   twitterAccessToken    String?
   twitterRefreshToken   String?
   twitterTokenExpiry    DateTime?

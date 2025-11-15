@@ -90,6 +90,43 @@ No active issues at this time.
 
 ---
 
+[x] **Issue #7 - User-Owned LinkedIn OAuth Credentials** (Resolved in v0.14.0)
+
+**Problem:** The app required shared LinkedIn OAuth credentials via environment variables, making it unsuitable for self-hosted, single-user deployments. Users had to trust the app distributor with their LinkedIn integration, and couldn't use their own LinkedIn app credentials.
+
+**Requirements:**
+- Enable users to configure their own LinkedIn OAuth app credentials
+- Remove dependency on environment variables for LinkedIn integration
+- Provide user-friendly UI for OAuth app setup
+- Maintain backward compatibility with existing env var approach
+- Give users full control and ownership of their LinkedIn integration
+
+**Solution:** Implemented user-owned OAuth credential management system:
+- **Database Storage**: Added `linkedinClientId`, `linkedinClientSecret`, and `linkedinRedirectUri` fields to User model
+- **Settings API**: Created `/api/settings/linkedin` endpoint (GET/POST/DELETE) for credential management
+- **Configuration UI**: Built `LinkedInSettingsDialog` with 4-step wizard guiding users through LinkedIn app creation
+- **Smart Priority**: Database credentials take priority over environment variables (graceful fallback)
+- **Three-State UX**: Clear visual states for Not Configured / Configured / Connected
+
+**Implementation:**
+- Modified auth routes to check database first, then fall back to env vars
+- Created comprehensive settings management UI with copy-paste helpers
+- Updated Campaigns page with "Configure LinkedIn" button when not configured
+- Added 16 integration tests covering all credential lifecycle scenarios
+- Fully backward compatible - env vars still work as fallback
+
+**User Impact:**
+- No environment variables needed for LinkedIn integration
+- Users create and configure their own LinkedIn app
+- Full ownership and control of OAuth credentials
+- Better privacy - posts come from user's own LinkedIn app
+- Easier deployment - one less setup step
+- Visual setup wizard with step-by-step guidance
+
+**See:** `backlog/release-0.14.0.md` for detailed release notes
+
+---
+
 [x] **Issue #6 - LinkedIn OAuth Configuration Error** (Resolved in v0.13.1)
 
 **Problem:** When clicking "Connect LinkedIn" button without having LinkedIn OAuth credentials configured, users received a raw JSON error response instead of a user-friendly message. The error appeared as: `{"error":"LinkedIn OAuth not configured","message":"Please set LINKEDIN_CLIENT_ID and LINKEDIN_REDIRECT_URI environment variables"}`

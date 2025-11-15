@@ -9,20 +9,19 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(request: NextRequest) {
   try {
+    const user = await prisma.user.findFirst();
+
     // Check if LinkedIn OAuth is configured
-    const linkedinConfigured = !!(
-      process.env.LINKEDIN_CLIENT_ID &&
-      process.env.LINKEDIN_CLIENT_SECRET &&
-      process.env.LINKEDIN_REDIRECT_URI
-    );
+    // Priority: User's database credentials > Environment variables (fallback)
+    const linkedinConfigured = user
+      ? !!(user.linkedinClientId && user.linkedinClientSecret && user.linkedinRedirectUri)
+      : !!(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET && process.env.LINKEDIN_REDIRECT_URI);
 
     // Check if Twitter OAuth is configured (future feature)
     const twitterConfigured = !!(
       process.env.TWITTER_CLIENT_ID &&
       process.env.TWITTER_CLIENT_SECRET
     );
-
-    const user = await prisma.user.findFirst();
 
     if (!user) {
       return NextResponse.json({

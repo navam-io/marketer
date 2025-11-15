@@ -35,9 +35,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const clientId = process.env.LINKEDIN_CLIENT_ID;
-    const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-    const redirectUri = process.env.LINKEDIN_REDIRECT_URI;
+    // Get user to check for database credentials
+    let user = await prisma.user.findFirst();
+
+    let clientId: string | undefined;
+    let clientSecret: string | undefined;
+    let redirectUri: string | undefined;
+
+    if (user?.linkedinClientId && user?.linkedinClientSecret && user?.linkedinRedirectUri) {
+      // Use user's configured credentials from database
+      clientId = user.linkedinClientId;
+      clientSecret = user.linkedinClientSecret;
+      redirectUri = user.linkedinRedirectUri;
+    } else {
+      // Fallback to environment variables (legacy support)
+      clientId = process.env.LINKEDIN_CLIENT_ID;
+      clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
+      redirectUri = process.env.LINKEDIN_REDIRECT_URI;
+    }
 
     if (!clientId || !clientSecret || !redirectUri) {
       return NextResponse.redirect(
@@ -91,7 +106,8 @@ export async function GET(request: NextRequest) {
     const linkedinUserId = profileData.id;
 
     // Store or update tokens in User table (single user)
-    let user = await prisma.user.findFirst();
+    // Re-fetch user in case it was created during credential check
+    user = await prisma.user.findFirst();
 
     if (user) {
       // Update existing user
