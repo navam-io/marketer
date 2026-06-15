@@ -1,15 +1,14 @@
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from '@prisma/client';
 
 // Create a singleton instance for tests
 const globalForPrisma = global as unknown as { prismaTest: PrismaClient };
 
-export const prismaTest = globalForPrisma.prismaTest || new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL || 'file:./test.db'
-    }
-  }
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || 'file:./prisma/test.db'
 });
+
+export const prismaTest = globalForPrisma.prismaTest || new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prismaTest = prismaTest;
 
