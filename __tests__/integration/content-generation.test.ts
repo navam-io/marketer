@@ -239,7 +239,7 @@ describe('Content Generation Integration Tests (Slice 3)', () => {
       const twitter = tasks.find(t => t.platform === 'twitter');
       const blog = tasks.find(t => t.platform === 'blog');
 
-      expect(linkedin?.content!.length).toBeGreaterThan(twitter?.content!.length);
+      expect(linkedin!.content!.length).toBeGreaterThan(twitter!.content!.length);
       expect(JSON.parse(linkedin?.outputJson!).hashtags).toHaveLength(5);
       expect(JSON.parse(twitter?.outputJson!).hashtags).toHaveLength(1);
       expect(JSON.parse(blog?.outputJson!).hashtags).toHaveLength(0);

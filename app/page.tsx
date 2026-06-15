@@ -107,7 +107,7 @@ export default function Home() {
             <div>
               <h3 className="font-semibold mb-1">Add Sources</h3>
               <p className="text-sm text-muted-foreground">
-                Navigate to the Sources page and click "Add Source". Paste URLs from your blog posts, articles, or any web content you want to repurpose.
+                Navigate to the Sources page and click &quot;Add Source&quot;. Paste URLs from your blog posts, articles, or any web content you want to repurpose.
               </p>
             </div>
           </div>

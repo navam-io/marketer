@@ -7,8 +7,8 @@
 *Transform your content into social promotions with AI — Copy, paste, post. No OAuth, no complexity.*
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge)](https://github.com/yourusername/navam-marketer)
-[![Next.js](https://img.shields.io/badge/Next.js-15.0-black?logo=next.js&style=for-the-badge)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-black?logo=next.js&style=for-the-badge)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org/)
 [![Tests](https://img.shields.io/badge/tests-279_passing-success?style=for-the-badge)](https://github.com/yourusername/navam-marketer)
 [![License](https://img.shields.io/badge/license-Private-red.svg?style=for-the-badge)](LICENSE)
 
@@ -248,7 +248,7 @@ Track your social media engagement with real-time metrics and beautiful visualiz
 - **279 Tests** — 100% passing, comprehensive integration & component tests
 - **TypeScript** — Full type safety across the entire codebase
 - **API Routes** — RESTful conventions, clean architecture
-- **Hot Reload** — Fast development with Next.js 15
+- **Hot Reload** — Fast development with Next.js 16
 
 </details>
 
@@ -311,7 +311,7 @@ Copy → Paste → Post → Done ✨
 git clone https://github.com/yourusername/navam-marketer.git
 cd navam-marketer
 
-# Install dependencies (use --legacy-peer-deps for React 19 RC)
+# Install dependencies
 npm install --legacy-peer-deps
 
 # Set up environment variables
@@ -475,34 +475,33 @@ Chart:
 
 ### Frontend
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19_RC-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
 ### UI Components
 
 [![shadcn/ui](https://img.shields.io/badge/shadcn/ui-latest-000000?style=for-the-badge)](https://ui.shadcn.com/)
 [![Radix UI](https://img.shields.io/badge/Radix_UI-latest-161618?style=for-the-badge)](https://www.radix-ui.com/)
 [![dnd-kit](https://img.shields.io/badge/dnd--kit-6.3-000000?style=for-the-badge)](https://dndkit.com/)
-[![Recharts](https://img.shields.io/badge/Recharts-3.4-FF6384?style=for-the-badge)](https://recharts.org/)
+[![Recharts](https://img.shields.io/badge/Recharts-3.8-FF6384?style=for-the-badge)](https://recharts.org/)
 
 ### Backend
 
-[![Prisma](https://img.shields.io/badge/Prisma-6.0-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.8-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 [![SQLite](https://img.shields.io/badge/SQLite-local-003B57?style=for-the-badge&logo=sqlite)](https://www.sqlite.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-prod-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 
 ### State Management
 
 [![Zustand](https://img.shields.io/badge/Zustand-5.0-593D88?style=for-the-badge)](https://zustand-demo.pmnd.rs/)
-[![TanStack Query](https://img.shields.io/badge/TanStack_Query-5.0-FF4154?style=for-the-badge)](https://tanstack.com/query)
 
 ### AI & Tools
 
 [![Anthropic](https://img.shields.io/badge/Anthropic-Claude_4.5-D4A574?style=for-the-badge)](https://www.anthropic.com/)
-[![Mozilla Readability](https://img.shields.io/badge/Readability-0.5-000000?style=for-the-badge)](https://github.com/mozilla/readability)
-[![JSDOM](https://img.shields.io/badge/JSDOM-25.0-E34C26?style=for-the-badge)](https://github.com/jsdom/jsdom)
+[![Mozilla Readability](https://img.shields.io/badge/Readability-0.6-000000?style=for-the-badge)](https://github.com/mozilla/readability)
+[![JSDOM](https://img.shields.io/badge/JSDOM-29.1-E34C26?style=for-the-badge)](https://github.com/jsdom/jsdom)
 
 </div>
 
